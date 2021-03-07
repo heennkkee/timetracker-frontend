@@ -1,4 +1,5 @@
-const APIURL = 'http://localhost:5000';
+//const APIURL = 'http://localhost:5000';
+const APIURL = 'https://ha-timetracker-backend.herokuapp.com'
 
 class Api {
 
