@@ -18,7 +18,7 @@ const User = () => {
 		
 		fetchAsync();
 
-	}, []);
+	}, [ userId ]);
 
     
     const ThemeCtxt = useContext(ThemeContext);

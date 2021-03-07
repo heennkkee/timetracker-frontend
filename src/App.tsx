@@ -13,11 +13,6 @@ const User = React.lazy(() => import("./view/User"));
 const UserList = React.lazy(() => import("./view/UserList"));
 const FourOhFour = React.lazy(() => import("./view/FourOhFour"));
 
-
-interface IData {
-	items: null | string[]
-}
-
 function App() {
 
 	let storedMode = Cookies.get('mode');
