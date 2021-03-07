@@ -1,5 +1,7 @@
 import { useContext } from 'react';
 
+import { Link } from 'react-router-dom';
+
 import { ThemeContext, Theme } from '../context/ThemeContext';
 
 const Header = () => {
@@ -10,9 +12,9 @@ const Header = () => {
     return (
         <div className="row">
             <nav className={`navbar navbar-${theme} bg-${theme}`}>
-                <div className="navbar-brand">
-                    <img className="d-inlineblock align-top" src="logo192x192.png" height="30" width="30" alt="Flying money logo."></img> Let's track some time!
-                </div>
+                <Link to="/" className="navbar-brand">
+                    <img className="d-inlineblock align-top" src="/logo192x192.png" height="30" width="30" alt="Flying money logo."></img> Let's track some time!
+                </Link>
                 <button className={`btn btn-${themeInverse}`} onClick={() => {
                     ThemeCtxt.toggle();
                 }}>
