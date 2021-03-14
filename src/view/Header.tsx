@@ -16,7 +16,7 @@ const Header = () => {
 
     return (
         <>
-            {devCheck ? <div className="row p-2"><div className="alert alert-info">Running in development mode!</div></div> : null}
+            {devCheck ? <div className="row p-2"><div className="alert alert-warning">Running in development mode!</div></div> : null}
             <div className="row">
                 <nav className={`navbar navbar-${theme} bg-${theme}`}>
                     <Link to="/" className="navbar-brand">

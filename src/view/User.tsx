@@ -1,7 +1,9 @@
 import { useEffect, useState, useContext } from 'react';
-import Api from '../component/Api';
+import Api from '../helper/Api';
 import { useParams } from 'react-router-dom';
 import { Theme, ThemeContext } from '../context/ThemeContext';
+import Loadingspinner from '../component/Loadingspinner';
+import Errormessage from '../component/Errormessage';
 
 
 const User = () => {
@@ -17,8 +19,8 @@ const User = () => {
             if (resp.success) {
                 setUser(resp.data);
             } else {
-                if (resp.data !== undefined && resp.data.message !== undefined) {
-                    setError(resp.data.message ?? 'Something really shady went wrong..');
+                if (resp.error !== undefined && resp.error.message !== undefined) {
+                    setError(resp.error.message ?? 'Something really shady went wrong..');
                 }
             }
 
@@ -29,6 +31,11 @@ const User = () => {
 
 	}, [ userId ]);
 
+    const updateUser = async () => {
+
+        await Api.updateUser( { id: userId }, { name: user.name, email: user.email });
+    }
+
     
     const ThemeCtxt = useContext(ThemeContext);
     const theme = ( ThemeCtxt.mode === Theme.Dark ) ? 'dark' : 'light';
@@ -38,17 +45,12 @@ const User = () => {
     return (
         <div className="row">
             <div className="col-12">
-                <h2>User</h2>
                 {
                     (loadingData) ? 
-                    <div className="d-flex justify-content-center">
-                        <div className={`spinner-border text-${themeInverse}`} role="status">
-                            <span className="visually-hidden">Loading...</span>
-                        </div>
-                    </div>
+                        <Loadingspinner themeInverse={themeInverse} />
                     : 
                     (error !== "") ? 
-                        <p>{error}</p>
+                        <Errormessage message={error} />
                     :
                     <>
                         <div className="mb-3 row">
@@ -61,7 +63,7 @@ const User = () => {
                             <label htmlFor="userName" className="col-sm-2 col-form-label">Name</label>
                             <div className="col-sm-10">
                                 <input type="text" className={`form-control bg-${theme} text-${themeInverse}`} id="userName" value={user.name} onChange={(ev) => {
-                                    
+                                    setUser((user: any) => ({ ...user, name: ev.target.value }));
                                 }} />
                             </div>
                         </div>
@@ -69,9 +71,15 @@ const User = () => {
                             <label htmlFor="userEmail" className="col-sm-2 col-form-label">User ID</label>
                             <div className="col-sm-10">
                                 <input type="email" className={`form-control bg-${theme} text-${themeInverse}`} id="userEmail" value={user.email} onChange={(ev) => {
-                                    
+                                    setUser((user: any) => ({ ...user, email: ev.target.value }));
                                 }} />
                             </div>
+                        </div>
+                        <div className="row">
+                            <div className="col-10 offset-sm-2">
+                                <button type="submit" className="btn btn-success ml-auto" onClick={updateUser}>Save</button>
+                            </div>
+
                         </div>
                     </>
                 }
