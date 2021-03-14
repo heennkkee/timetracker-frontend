@@ -38,37 +38,33 @@ function App() {
 			<Router>
 				<div className={`container bg-${theme} text-${themeInverse}`}>
 					<Header />
-					<Switch>
+					<main>
+						<Switch>
+							<Route exact path="/users/:userId">
+								<Suspense fallback={''}>
+									<User />
+								</Suspense>
+							</Route>
 
-						<Route exact path="/users/:userId">
-							<Suspense fallback={''}>
-								<User />
-							</Suspense>
-						</Route>
-
-						<Route exact path="/users">
-							<Suspense fallback={''}>
-								<UserList />
-							</Suspense>
-						</Route>
-						
-						<Route exact path="/">
-							<main>
-								<h2>Hellooo</h2>
-									<p>
-										<Link to="/users" className="link-info" >Users</Link>
-									</p>
-							</main>
-						</Route>
-						
-						<Route path="/">
-							<Suspense fallback={''}>
-								<FourOhFour />
-							</Suspense>
-						</Route>
-
-					</Switch>
-
+							<Route exact path="/users">
+								<Suspense fallback={''}>
+									<UserList />
+								</Suspense>
+							</Route>
+							
+							<Route exact path="/">
+								<p>
+									<Link to="/users" className="link-info" >Users</Link>
+								</p>
+							</Route>
+							
+							<Route path="/">
+								<Suspense fallback={''}>
+									<FourOhFour />
+								</Suspense>
+							</Route>
+						</Switch>
+					</main>
 					<Footer />
 				</div>
 			</Router>

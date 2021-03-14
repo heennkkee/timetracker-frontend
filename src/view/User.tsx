@@ -5,15 +5,24 @@ import { Theme, ThemeContext } from '../context/ThemeContext';
 
 
 const User = () => {
-    const [user, setUser] = useState<undefined | null | any>(undefined);
+    const [user, setUser] = useState<null | any>(null);
+    const [error, setError] = useState<string>("");
+    const [loadingData, setLoadingData] = useState<boolean>(true);
 
     const { userId } = useParams<{ userId: string }>();
 
 	useEffect(() => {
 		const fetchAsync = async () => {
-			const user = await Api.loadUser(parseInt(userId));
-            console.log(user);
-			setUser(user);
+			const resp = await Api.loadUser(parseInt(userId));
+            if (resp.success) {
+                setUser(resp.data);
+            } else {
+                if (resp.data !== undefined && resp.data.message !== undefined) {
+                    setError(resp.data.message ?? 'Something really shady went wrong..');
+                }
+            }
+
+            setLoadingData(false);
 		}
 		
 		fetchAsync();
@@ -31,15 +40,15 @@ const User = () => {
             <div className="col-12">
                 <h2>User</h2>
                 {
-                    (user === undefined) ? 
+                    (loadingData) ? 
                     <div className="d-flex justify-content-center">
                         <div className={`spinner-border text-${themeInverse}`} role="status">
                             <span className="visually-hidden">Loading...</span>
                         </div>
                     </div>
                     : 
-                    (user === null) ? 
-                        <p>Failed to load user with ID '{userId}'</p>
+                    (error !== "") ? 
+                        <p>{error}</p>
                     :
                     <>
                         <div className="mb-3 row">
