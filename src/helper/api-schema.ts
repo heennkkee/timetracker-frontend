@@ -5,156 +5,151 @@
 
 export interface paths {
   "/users": {
-    /** Get all users */
     get: operations["users.list_all"];
-    /** Add a user */
     post: operations["users.add"];
   };
   "/users/{id}": {
-    /** Get one user with specified ID */
     get: operations["users.get"];
-    /** Update user with specified ID */
     put: operations["users.update"];
     /** Remove a user with specified ID */
     delete: operations["users.remove"];
   };
+  "/users/{userid}/clockings": {
+    get: operations["clockings.list_users_all_clockings"];
+    post: operations["clockings.add"];
+  };
+}
+
+export interface components {
+  schemas: {
+    User: {
+      id: number;
+      name: string;
+      email: string;
+    };
+    UserInput: {
+      name: string;
+      email: string;
+    };
+    Error: {
+      message: string;
+    };
+    Clocking: {
+      id: number;
+      direction: "in" | "out";
+      user_id: number;
+      datetime: string;
+    };
+    ClockingInput: {
+      direction: "in" | "out";
+      datetime?: string;
+    };
+  };
 }
 
 export interface operations {
-  /** Get all users */
   "users.list_all": {
     responses: {
-      /** Lists all users */
+      /** List all users */
       200: {
-        schema: {
-          success?: boolean;
-          data?: {
-            id?: number;
-            name?: string;
-          }[];
-          error?: {
-            message?: string;
+        content: {
+          "application/json": {
+            success?: boolean;
+            data?: components["schemas"]["User"][];
+            error?: components["schemas"]["Error"];
           };
         };
       };
     };
   };
-  /** Add a user */
   "users.add": {
-    parameters: {
-      body: {
-        user: {
-          email?: string;
-          name?: string;
-        };
-      };
-    };
     responses: {
       /** The new user was successfully created */
       201: {
-        schema: {
-          success?: boolean;
-          data?: {
-            id?: number;
-            name?: string;
-            email?: string;
-          };
-          error?: {
-            message?: string;
+        content: {
+          "application/json": {
+            success?: boolean;
+            data?: components["schemas"]["User"];
+            error?: components["schemas"]["Error"];
           };
         };
       };
       /** Failed to add new user due to input error */
       400: {
-        schema: {
-          success?: boolean;
-          data?: {
-            message?: string;
-          };
-          error?: {
-            message?: string;
+        content: {
+          "application/json": {
+            success?: boolean;
+            error?: components["schemas"]["Error"];
           };
         };
       };
     };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UserInput"];
+      };
+    };
   };
-  /** Get one user with specified ID */
   "users.get": {
     parameters: {
       path: {
         /** ID of user to get */
-        id: string;
+        id: number;
       };
     };
     responses: {
       /** User that was found */
       200: {
-        schema: {
-          success?: boolean;
-          data?: {
-            id?: number;
-            name?: string;
-            email?: string;
-          };
-          error?: {
-            message?: string;
+        content: {
+          "application/json": {
+            success?: boolean;
+            data?: components["schemas"]["User"];
+            error?: components["schemas"]["Error"];
           };
         };
       };
       /** User was not found */
       404: {
-        schema: {
-          success?: boolean;
-          data?: {
-            message?: string;
-          };
-          error?: {
-            message?: string;
+        content: {
+          "application/json": {
+            success?: boolean;
+            error?: components["schemas"]["Error"];
           };
         };
       };
     };
   };
-  /** Update user with specified ID */
   "users.update": {
     parameters: {
       path: {
         /** ID of user to update */
-        id: string;
-      };
-      body: {
-        user?: {
-          name?: string;
-          email?: string;
-        };
+        id: number;
       };
     };
     responses: {
       /** The user that was updated */
       200: {
-        schema: {
-          success?: boolean;
-          data?: {
-            id?: number;
-            name?: string;
-            email?: string;
-          };
-          error?: {
-            message?: string;
+        content: {
+          "application/json": {
+            success?: boolean;
+            data?: components["schemas"]["User"];
+            error?: components["schemas"]["Error"];
           };
         };
       };
       /** Failed to find user */
       404: {
-        schema: {
-          success?: boolean;
-          data?: {
-            message?: string;
-          };
-          error?: {
-            message?: string;
+        content: {
+          "application/json": {
+            success?: boolean;
+            error?: components["schemas"]["Error"];
           };
         };
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UserInput"];
       };
     };
   };
@@ -163,15 +158,102 @@ export interface operations {
     parameters: {
       path: {
         /** ID of user */
-        id: string;
+        id: number;
       };
     };
     responses: {
       /** User was removed */
       200: {
-        schema: {
-          success?: boolean;
+        content: {
+          "application/json": {
+            success?: boolean;
+          };
         };
+      };
+      /** Failed to find user */
+      404: {
+        content: {
+          "application/json": {
+            success?: boolean;
+            error?: components["schemas"]["Error"];
+          };
+        };
+      };
+    };
+  };
+  "clockings.list_users_all_clockings": {
+    parameters: {
+      path: {
+        /** userid to load clockings for */
+        userid: number;
+      };
+      query: {
+        /** Optional parameter to limit number of returns */
+        limit?: number;
+      };
+    };
+    responses: {
+      /** Clockings */
+      200: {
+        content: {
+          "application/json": {
+            success?: boolean;
+            data?: components["schemas"]["Clocking"][];
+            error?: components["schemas"]["Error"];
+          };
+        };
+      };
+      /** User was not found */
+      404: {
+        content: {
+          "application/json": {
+            success?: boolean;
+            error?: components["schemas"]["Error"];
+          };
+        };
+      };
+    };
+  };
+  "clockings.add": {
+    parameters: {
+      path: {
+        /** User ID to add clocking for */
+        userid: number;
+      };
+    };
+    responses: {
+      /** Clocking was created */
+      201: {
+        content: {
+          "application/json": {
+            success?: boolean;
+            data?: components["schemas"]["Clocking"];
+            error?: components["schemas"]["Error"];
+          };
+        };
+      };
+      /** Failed to add new clocking due to input error */
+      400: {
+        content: {
+          "application/json": {
+            success?: boolean;
+            error?: components["schemas"]["Error"];
+          };
+        };
+      };
+      /** User was not found */
+      404: {
+        content: {
+          "application/json": {
+            success?: boolean;
+            error?: components["schemas"]["Error"];
+          };
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ClockingInput"];
       };
     };
   };

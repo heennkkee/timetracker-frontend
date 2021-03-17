@@ -24,12 +24,27 @@ function App() {
 
 	const [mode, setMode] = useState<Theme>(defaultMode);
 
+	const [session, setSession] = useState<string>("");
+
 	const toggleMode = () => {
 		let newMode = (mode === Theme.Light) ? Theme.Dark : Theme.Light;
 		Cookies.set("mode", newMode);
 		setMode(newMode);
 	}
- 
+
+	const login = async () => {
+		fetch('http://localhost:5000/api/auth/1/login', { headers: { 'Content-Type': 'application/json' }, credentials: 'include', method: 'POST', body: JSON.stringify({ 'password': 'test' })}).then(resp => resp.json()).then(json => {
+			console.log(json);
+			setSession(json.data.session);
+		});
+	}
+
+	const logout = async () => {
+		fetch('http://localhost:5000/api/auth/1/logout', { headers: { 'Content-Type': 'application/json' }, credentials: 'include', method: 'POST', body: JSON.stringify({ "session": session })}).then(resp => resp.json()).then(json => {
+			console.log(json);
+		});
+	}
+
 	const theme = ( mode === Theme.Dark ) ? 'dark' : 'light';
     const themeInverse = ( mode === Theme.Dark ) ? 'light' : 'dark';
 
@@ -38,6 +53,8 @@ function App() {
 			<Router>
 				<div className={`container bg-${theme} text-${themeInverse}`}>
 					<Header />
+					<button onClick={login}>Login</button>
+					<button onClick={logout}>Logout</button>
 					<main>
 						<Switch>
 							<Route exact path="/users/:userId">

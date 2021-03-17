@@ -17,7 +17,7 @@ const User = () => {
 		const fetchAsync = async () => {
 			const resp = await Api.loadUser(parseInt(userId));
             if (resp.success) {
-                setUser(resp.data);
+                setUser((resp as any).data);
             } else {
                 if (resp.error !== undefined && resp.error.message !== undefined) {
                     setError(resp.error.message ?? 'Something really shady went wrong..');
@@ -33,7 +33,7 @@ const User = () => {
 
     const updateUser = async () => {
 
-        await Api.updateUser( { id: userId }, { name: user.name, email: user.email });
+        await Api.updateUser( { id: parseInt(userId) }, { name: user.name, email: user.email });
     }
 
     
