@@ -6,6 +6,7 @@ import { ThemeContext, Theme } from './context/ThemeContext';
 import Header from './view/Header';
 import Footer from './view/Footer';
 
+import API from './helper/Api';
 
 import Cookies from './helper/Cookies';
 
@@ -32,19 +33,6 @@ function App() {
 		setMode(newMode);
 	}
 
-	const login = async () => {
-		fetch('http://localhost:5000/api/auth/1/login', { headers: { 'Content-Type': 'application/json' }, credentials: 'include', method: 'POST', body: JSON.stringify({ 'password': 'test' })}).then(resp => resp.json()).then(json => {
-			console.log(json);
-			setSession(json.data.session);
-		});
-	}
-
-	const logout = async () => {
-		fetch('http://localhost:5000/api/auth/1/logout', { headers: { 'Content-Type': 'application/json' }, credentials: 'include', method: 'POST', body: JSON.stringify({ "session": session })}).then(resp => resp.json()).then(json => {
-			console.log(json);
-		});
-	}
-
 	const theme = ( mode === Theme.Dark ) ? 'dark' : 'light';
     const themeInverse = ( mode === Theme.Dark ) ? 'light' : 'dark';
 
@@ -53,8 +41,8 @@ function App() {
 			<Router>
 				<div className={`container bg-${theme} text-${themeInverse}`}>
 					<Header />
-					<button onClick={login}>Login</button>
-					<button onClick={logout}>Logout</button>
+					<button onClick={async () => { let sess = await API.login(); setSession(sess); }}>Login</button>
+					<button onClick={() => { API.logout(session); setSession(""); }}>Logout</button>
 					<main>
 						<Switch>
 							<Route exact path="/users/:userId">

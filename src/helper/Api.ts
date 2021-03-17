@@ -53,6 +53,22 @@ class Api {
 
         return resp;
     }
+
+    static login = async () => {
+		const resp = await fetch(`${APIURL}/auth/1/login`, { headers: { 'Content-Type': 'application/json' }, credentials: 'include', method: 'POST', body: JSON.stringify({ 'password': 'test' })}).then(resp => resp.json()).then(json => {
+			console.log(json);
+			return (json.data.session);
+		});
+
+        return resp.data.session;
+	}
+
+	static logout = async (session: string) => {
+		fetch(`${APIURL}/auth/1/logout`, { headers: { 'Content-Type': 'application/json' }, credentials: 'include', method: 'POST', body: JSON.stringify({ "session": session })}).then(resp => resp.json()).then(json => {
+			console.log(json);
+		});
+	}
+
 }
 
 export default Api;
