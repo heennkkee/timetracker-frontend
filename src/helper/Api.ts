@@ -19,6 +19,8 @@ type USERS_PUT_404 = paths["/users/{userid}"]["put"]["responses"]["404"]["conten
 
 type USERS_LIST_200 = paths["/users"]["get"]["responses"]["200"]["content"]["application/json"];
 
+type CHECK_200 = paths["/check"]["get"]["responses"]["200"]["content"]["application/json"];
+type CHECK_401 = paths["/check"]["get"]["responses"]["401"]["content"]["application/json"];
 
 type GENERIC_ERROR = {
     status: 500,
@@ -78,6 +80,13 @@ class Api {
 
         return resp;
 	}
+
+    static check = async() => {
+        const resp = await fetch(`${APIURL}/check`, { headers: { 'Content-Type': 'application/json' }, credentials: 'include', method: 'GET'}).then(resp => resp.json()).then((json: CHECK_200 | CHECK_401) => {
+            return json;
+        });
+        return resp;
+    }
 
 }
 

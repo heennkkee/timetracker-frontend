@@ -18,6 +18,9 @@ export interface paths {
     get: operations["clockings.list_users_all_clockings"];
     post: operations["clockings.add"];
   };
+  "/check": {
+    get: operations["auth.check"];
+  };
   "/auth/{userid}/login": {
     post: operations["auth.login"];
   };
@@ -66,6 +69,18 @@ export interface components {
     };
     /** Request failed due to input error */
     InputError: {
+      content: {
+        "application/json": components["schemas"]["DefaultError"];
+      };
+    };
+    /** Request failed on the server */
+    ServerError: {
+      content: {
+        "application/json": components["schemas"]["DefaultError"];
+      };
+    };
+    /** Requester is not authorized */
+    NotAuthorized: {
       content: {
         "application/json": components["schemas"]["DefaultError"];
       };
@@ -173,6 +188,7 @@ export interface operations {
         };
       };
       404: components["responses"]["NotFound"];
+      500: components["responses"]["ServerError"];
     };
   };
   "clockings.list_users_all_clockings": {
@@ -225,6 +241,19 @@ export interface operations {
       };
     };
   };
+  "auth.check": {
+    responses: {
+      /** Authentication OK */
+      200: {
+        content: {
+          "application/json": {
+            status?: 200;
+          };
+        };
+      };
+      401: components["responses"]["NotAuthorized"];
+    };
+  };
   "auth.login": {
     parameters: {
       path: {
@@ -247,12 +276,7 @@ export interface operations {
           };
         };
       };
-      /** Failed to authorize */
-      401: {
-        content: {
-          "application/json": components["schemas"]["DefaultError"];
-        };
-      };
+      401: components["responses"]["NotAuthorized"];
     };
     requestBody: {
       content: {

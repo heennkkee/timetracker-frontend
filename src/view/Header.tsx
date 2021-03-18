@@ -1,6 +1,7 @@
 import { useContext } from 'react';
 
 import { Link, useLocation } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
 
 import { ThemeContext, Theme } from '../context/ThemeContext';
 
@@ -9,24 +10,43 @@ const Header = () => {
     const theme = ( ThemeCtxt.mode === Theme.Dark ) ? 'dark' : 'light';
     const themeInverse = ( ThemeCtxt.mode === Theme.Dark ) ? 'light' : 'dark';
 
+    const AuthCtxt = useContext(AuthContext);
+
     let location = useLocation().pathname.split('/');
     location = location.filter((str, ix) => location.indexOf(str) === ix);
-
     const devCheck = process.env.NODE_ENV === 'development';
 
     return (
         <>
             {devCheck ? <div className="row p-2"><div className="alert alert-warning">Running in development mode!</div></div> : null}
             <div className="row">
-                <nav className={`navbar navbar-${theme} bg-${theme}`}>
+                <nav className={`navbar navbar-${theme} bg-${theme} navbar-expand-lg`}>
                     <Link to="/" className="navbar-brand">
                         <img className="d-inlineblock align-top" src="/logo192x192.png" height="30" width="30" alt="Flying money logo."></img> Let's track some time!
                     </Link>
-                    <button className={`btn btn-${themeInverse}`} onClick={() => {
-                        ThemeCtxt.toggle();
-                    }}>
-                        { ThemeCtxt.mode === Theme.Light ? 'Dark' : 'Light'}
+                    <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                        <span className="navbar-toggler-icon"></span>
                     </button>
+                    <div className="collapse navbar-collapse" id="navbarCollapse">
+                        <ul className="navbar-nav me-auto">
+                            <li className="nav-item">
+                                <Link to="/users" className={`nav-link ${location[1] === 'users' ? 'active' : ''}`}>Users</Link>
+                            </li>
+                        </ul>
+                        <div className="form-inline">
+                            {
+                                AuthCtxt.authenticated ? 
+                                    <button className={`btn btn-${themeInverse} me-2`} onClick={async () => { await AuthCtxt.logout(); }}>Logout</button>
+                                :
+                                    <button className={`btn btn-${themeInverse} me-2`} onClick={async () => { await AuthCtxt.login(); }}>Login</button>
+                            }
+                            <button className={`btn btn-${themeInverse}`} onClick={() => {
+                                ThemeCtxt.toggle();
+                            }}>
+                                { ThemeCtxt.mode === Theme.Light ? 'Dark' : 'Light'}
+                            </button>
+                        </div>
+                    </div>
                 </nav>
                 {
                     location.length >= 1 ? 
