@@ -11,20 +11,28 @@ class Cookies {
         document.cookie = `${name}=${value}; expires=${date.toUTCString()}; path=${path}`;
     }
 
-    static get(name: string, defValue: string | undefined = undefined) {
+    static get(name: string) {
 
-        let parts;
+        let parts: string[] = [];
         if (document.cookie.indexOf(';') > -1) {
-            parts = document.cookie.split("; " + name + "=");
+            let cookies = document.cookie.split("; ");
+            for (let ix in cookies) {
+                if (cookies[ix].indexOf(`${name}=`) > -1) {
+                    parts = cookies[ix].split("=");
+                    break;
+                }
+            }
         } else {
             parts = document.cookie.split("=");
         }
         
         
         if (parts.length === 2) {
-            let val = parts.pop();
-            if (val !== undefined) {
-                return val;
+            if (parts[0] === name) {
+                let val = parts.pop();
+                if (val !== undefined) {
+                    return val;
+                }
             }
         }
     }
