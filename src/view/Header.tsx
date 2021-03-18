@@ -33,7 +33,7 @@ const Header = () => {
                         <div aria-label="breadcrumb">
                             <ol className="breadcrumb">
                                 { location.map((link: string, ix: number) => {
-                                    let text = link.length > 1 ? link.toLocaleUpperCase()[0] + link.substring(1, link.length - 1) : link;
+                                    let text = link.length > 1 ? link.toLocaleUpperCase()[0] + link.substring(1, link.length) : link;
 
                                     if (ix === location.length - 1) {
                                         return <li key={link} className="breadcrumb-item active">{text}</li>
