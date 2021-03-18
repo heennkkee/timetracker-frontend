@@ -16,16 +16,20 @@ const FourOhFour = React.lazy(() => import("./view/FourOhFour"));
 
 function App() {
 
-	let storedMode = Cookies.get('mode');
-	let defaultMode = Theme.Light;
+	const [mode, setMode] = useState<Theme>(() => {
+		let storedMode = Cookies.get('mode');
+		let setTheme = Theme.Light;
+	
+		if (storedMode !== undefined && Object.keys(Theme).includes(storedMode as Theme)) {
+			setTheme = Theme[storedMode as keyof typeof Theme];
+		}
+		
+		return setTheme;
+	});
 
-	if (storedMode !== undefined && Object.keys(Theme).includes(storedMode as Theme)) {
-		defaultMode = Theme[storedMode as keyof typeof Theme];
-	}
-
-	const [mode, setMode] = useState<Theme>(defaultMode);
-
-	const [session, setSession] = useState<string>(Cookies.get('session') ?? "");
+	const [session, setSession] = useState<string>(() => {
+		return Cookies.get('session') ?? "";
+	});
 
 	const toggleMode = () => {
 		let newMode = (mode === Theme.Light) ? Theme.Dark : Theme.Light;

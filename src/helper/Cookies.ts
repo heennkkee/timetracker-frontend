@@ -13,26 +13,13 @@ class Cookies {
 
     static get(name: string) {
 
-        let parts: string[] = [];
-        if (document.cookie.indexOf(';') > -1) {
-            let cookies = document.cookie.split("; ");
-            for (let ix in cookies) {
-                if (cookies[ix].indexOf(`${name}=`) > -1) {
-                    parts = cookies[ix].split("=");
-                    break;
-                }
-            }
-        } else {
-            parts = document.cookie.split("=");
-        }
-        
-        
-        if (parts.length === 2) {
-            if (parts[0] === name) {
+        let cookies = document.cookie.split("; ");
+
+        for (let ix in cookies) {
+            if (cookies[ix].indexOf(`${name}=`) > -1) {
+                let parts = cookies[ix].split("=");
                 let val = parts.pop();
-                if (val !== undefined) {
-                    return val;
-                }
+                return val;
             }
         }
     }
