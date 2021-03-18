@@ -1,3 +1,5 @@
+//npx openapi-typescript ../timetracker-backend/API-spec.yaml --output src/helper/api-schema.ts
+
 import { paths } from './api-schema';
 
 const APIURL = process.env.NODE_ENV === 'development' ?  
@@ -6,39 +8,45 @@ const APIURL = process.env.NODE_ENV === 'development' ?
 
 
 
-type USERS_GET_200 = paths["/users/{id}"]["get"]["responses"]["200"]["content"]["application/json"];
-type USERS_GET_404 = paths["/users/{id}"]["get"]["responses"]["404"]["content"]["application/json"];
+type USERS_GET_200 = paths["/users/{userid}"]["get"]["responses"]["200"]["content"]["application/json"];
+type USERS_GET_404 = paths["/users/{userid}"]["get"]["responses"]["404"]["content"]["application/json"];
 
-type USERS_PUT_BODY = paths["/users/{id}"]["put"]["requestBody"]["content"]["application/json"];
-type USERS_PUT_PATH = paths["/users/{id}"]["put"]["parameters"]["path"];
-type USERS_PUT_200 = paths["/users/{id}"]["put"]["responses"]["200"]["content"]["application/json"];
-type USERS_PUT_404 = paths["/users/{id}"]["put"]["responses"]["404"]["content"]["application/json"];
+type USERS_PUT_BODY = paths["/users/{userid}"]["put"]["requestBody"]["content"]["application/json"];
+type USERS_PUT_PATH = paths["/users/{userid}"]["put"]["parameters"]["path"];
+type USERS_PUT_200 = paths["/users/{userid}"]["put"]["responses"]["200"]["content"]["application/json"];
+type USERS_PUT_404 = paths["/users/{userid}"]["put"]["responses"]["404"]["content"]["application/json"];
 
 
 type USERS_LIST_200 = paths["/users"]["get"]["responses"]["200"]["content"]["application/json"];
 
 
+type GENERIC_ERROR = {
+    status: 500,
+    detail: string,
+    title: string
+}
+
 
 
 class Api {
 
-    static loadUser = async (id: number) => {
-        const resp = await fetch(`${APIURL}/users/${id}`, { credentials: 'include' }).then(resp => resp.json()).then((jsonResp: USERS_GET_200 | USERS_GET_404) => {
+    static loadUser = async (userid: number) => {
+        const resp = await fetch(`${APIURL}/users/${userid}`, { credentials: 'include' }).then(resp => resp.json()).then((jsonResp: USERS_GET_200 | USERS_GET_404) => {
             return jsonResp;
         }).catch((err) => {
-            return { success: false, data: {}, error: { message: `Generic error: ${err.message}.`}};
+            return { status: 500, detail: `Generic error: ${err.message}.`, title: 'Error' } as GENERIC_ERROR;
         });
 
         return resp;
     }
 
     static updateUser = async (path: USERS_PUT_PATH, user: USERS_PUT_BODY) => {
-        const resp = await fetch(`${APIURL}/users/${path.id}`, { credentials: 'include', method: 'PUT', headers: { 'Content-Type': 'application/json'}, body: JSON.stringify(user) })
+        const resp = await fetch(`${APIURL}/users/${path.userid}`, { credentials: 'include', method: 'PUT', headers: { 'Content-Type': 'application/json'}, body: JSON.stringify(user) })
             .then(resp => resp.json())
             .then((json: USERS_PUT_200 | USERS_PUT_404) => {
                 return json;
         }).catch((err) => {
-            return { success: false, data: {}, error: { message: `Generic error: ${err.message}.`} };
+            return { status: 500, detail: `Generic error: ${err.message}.`, title: 'Error' } as GENERIC_ERROR;
         })
 
         return resp;
@@ -48,7 +56,7 @@ class Api {
         const resp = await fetch(`${APIURL}/users`, { credentials: 'include' }).then(resp => resp.json()).then((jsonResp: USERS_LIST_200) => {
             return jsonResp;
         }).catch((err) => {
-            return { success: false, data: [], error: { message: `Generic error: ${err.message}.`}};
+            return { status: 500, detail: `Generic error: ${err.message}.`, title: 'Error' } as GENERIC_ERROR;
         });
 
         return resp;
@@ -60,13 +68,15 @@ class Api {
 			return (json.data.session);
 		});
 
-        return resp.data.session;
+        return resp;
 	}
 
 	static logout = async (session: string) => {
-		fetch(`${APIURL}/auth/1/logout`, { headers: { 'Content-Type': 'application/json' }, credentials: 'include', method: 'POST', body: JSON.stringify({ "session": session })}).then(resp => resp.json()).then(json => {
-			console.log(json);
+		const resp = await fetch(`${APIURL}/auth/1/logout`, { headers: { 'Content-Type': 'application/json' }, credentials: 'include', method: 'POST', body: JSON.stringify({ "session": session })}).then(resp => resp.json()).then(json => {
+			return json;
 		});
+
+        return resp;
 	}
 
 }

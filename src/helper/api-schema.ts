@@ -8,7 +8,7 @@ export interface paths {
     get: operations["users.list_all"];
     post: operations["users.add"];
   };
-  "/users/{id}": {
+  "/users/{userid}": {
     get: operations["users.get"];
     put: operations["users.update"];
     /** Remove a user with specified ID */
@@ -17,6 +17,12 @@ export interface paths {
   "/users/{userid}/clockings": {
     get: operations["clockings.list_users_all_clockings"];
     post: operations["clockings.add"];
+  };
+  "/auth/{userid}/login": {
+    post: operations["auth.login"];
+  };
+  "/auth/{userid}/logout": {
+    post: operations["auth.logout"];
   };
 }
 
@@ -34,6 +40,12 @@ export interface components {
     Error: {
       message: string;
     };
+    DefaultError: {
+      detail: string;
+      status: 400 | 401 | 403 | 404;
+      title: string;
+      type?: string;
+    };
     Clocking: {
       id: number;
       direction: "in" | "out";
@@ -45,6 +57,24 @@ export interface components {
       datetime?: string;
     };
   };
+  responses: {
+    /** Resource not found */
+    NotFound: {
+      content: {
+        "application/json": components["schemas"]["DefaultError"];
+      };
+    };
+    /** Request failed due to input error */
+    InputError: {
+      content: {
+        "application/json": components["schemas"]["DefaultError"];
+      };
+    };
+  };
+  parameters: {
+    /** Userid */
+    UserId: number;
+  };
 }
 
 export interface operations {
@@ -54,9 +84,8 @@ export interface operations {
       200: {
         content: {
           "application/json": {
-            success?: boolean;
-            data?: components["schemas"]["User"][];
-            error?: components["schemas"]["Error"];
+            status: 200;
+            data: components["schemas"]["User"][];
           };
         };
       };
@@ -68,21 +97,12 @@ export interface operations {
       201: {
         content: {
           "application/json": {
-            success?: boolean;
-            data?: components["schemas"]["User"];
-            error?: components["schemas"]["Error"];
+            status: 201;
+            data: components["schemas"]["User"];
           };
         };
       };
-      /** Failed to add new user due to input error */
-      400: {
-        content: {
-          "application/json": {
-            success?: boolean;
-            error?: components["schemas"]["Error"];
-          };
-        };
-      };
+      400: components["responses"]["InputError"];
     };
     requestBody: {
       content: {
@@ -93,8 +113,8 @@ export interface operations {
   "users.get": {
     parameters: {
       path: {
-        /** ID of user to get */
-        id: number;
+        /** Userid */
+        userid: components["parameters"]["UserId"];
       };
     };
     responses: {
@@ -102,28 +122,19 @@ export interface operations {
       200: {
         content: {
           "application/json": {
-            success?: boolean;
-            data?: components["schemas"]["User"];
-            error?: components["schemas"]["Error"];
+            status: 200;
+            data: components["schemas"]["User"];
           };
         };
       };
-      /** User was not found */
-      404: {
-        content: {
-          "application/json": {
-            success?: boolean;
-            error?: components["schemas"]["Error"];
-          };
-        };
-      };
+      404: components["responses"]["NotFound"];
     };
   };
   "users.update": {
     parameters: {
       path: {
-        /** ID of user to update */
-        id: number;
+        /** Userid */
+        userid: components["parameters"]["UserId"];
       };
     };
     responses: {
@@ -131,21 +142,12 @@ export interface operations {
       200: {
         content: {
           "application/json": {
-            success?: boolean;
-            data?: components["schemas"]["User"];
-            error?: components["schemas"]["Error"];
+            status: 200;
+            data: components["schemas"]["User"];
           };
         };
       };
-      /** Failed to find user */
-      404: {
-        content: {
-          "application/json": {
-            success?: boolean;
-            error?: components["schemas"]["Error"];
-          };
-        };
-      };
+      404: components["responses"]["NotFound"];
     };
     requestBody: {
       content: {
@@ -157,8 +159,8 @@ export interface operations {
   "users.remove": {
     parameters: {
       path: {
-        /** ID of user */
-        id: number;
+        /** Userid */
+        userid: components["parameters"]["UserId"];
       };
     };
     responses: {
@@ -166,26 +168,18 @@ export interface operations {
       200: {
         content: {
           "application/json": {
-            success?: boolean;
+            status: 200;
           };
         };
       };
-      /** Failed to find user */
-      404: {
-        content: {
-          "application/json": {
-            success?: boolean;
-            error?: components["schemas"]["Error"];
-          };
-        };
-      };
+      404: components["responses"]["NotFound"];
     };
   };
   "clockings.list_users_all_clockings": {
     parameters: {
       path: {
-        /** userid to load clockings for */
-        userid: number;
+        /** Userid */
+        userid: components["parameters"]["UserId"];
       };
       query: {
         /** Optional parameter to limit number of returns */
@@ -197,28 +191,19 @@ export interface operations {
       200: {
         content: {
           "application/json": {
-            success?: boolean;
-            data?: components["schemas"]["Clocking"][];
-            error?: components["schemas"]["Error"];
+            status: 200;
+            data: components["schemas"]["Clocking"][];
           };
         };
       };
-      /** User was not found */
-      404: {
-        content: {
-          "application/json": {
-            success?: boolean;
-            error?: components["schemas"]["Error"];
-          };
-        };
-      };
+      404: components["responses"]["NotFound"];
     };
   };
   "clockings.add": {
     parameters: {
       path: {
-        /** User ID to add clocking for */
-        userid: number;
+        /** Userid */
+        userid: components["parameters"]["UserId"];
       };
     };
     responses: {
@@ -226,34 +211,83 @@ export interface operations {
       201: {
         content: {
           "application/json": {
-            success?: boolean;
-            data?: components["schemas"]["Clocking"];
-            error?: components["schemas"]["Error"];
+            status: 201;
+            data: components["schemas"]["Clocking"];
           };
         };
       };
-      /** Failed to add new clocking due to input error */
-      400: {
+      400: components["responses"]["InputError"];
+      404: components["responses"]["NotFound"];
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ClockingInput"];
+      };
+    };
+  };
+  "auth.login": {
+    parameters: {
+      path: {
+        /** Userid */
+        userid: components["parameters"]["UserId"];
+      };
+    };
+    responses: {
+      /** Response with token */
+      200: {
+        headers: {
+          "Set-Cookie"?: string;
+        };
         content: {
           "application/json": {
-            success?: boolean;
-            error?: components["schemas"]["Error"];
+            status: 200;
+            data: {
+              session?: string;
+            };
           };
         };
       };
-      /** User was not found */
-      404: {
+      /** Failed to authorize */
+      401: {
+        content: {
+          "application/json": components["schemas"]["DefaultError"];
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          password?: string;
+        };
+      };
+    };
+  };
+  "auth.logout": {
+    parameters: {
+      path: {
+        /** Userid */
+        userid: components["parameters"]["UserId"];
+      };
+    };
+    responses: {
+      /** User is logged out */
+      200: {
+        headers: {
+          "Set-Cookie"?: string;
+        };
         content: {
           "application/json": {
-            success?: boolean;
-            error?: components["schemas"]["Error"];
+            status: 200;
+            data: { [key: string]: any };
           };
         };
       };
     };
     requestBody: {
       content: {
-        "application/json": components["schemas"]["ClockingInput"];
+        "application/json": {
+          session?: string;
+        };
       };
     };
   };

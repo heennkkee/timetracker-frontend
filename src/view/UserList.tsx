@@ -5,29 +5,21 @@ import Api from '../helper/Api';
 import { Theme, ThemeContext } from '../context/ThemeContext';
 
 import Loadingspinner from '../component/Loadingspinner';
-import Errormessage from '../component/Errormessage';
+import Errormessage, { Error } from '../component/Errormessage';
 
 const UserList = () => {
 
     const [users, setUsers] = useState<null | any[]>(null);
-    const [error, setError] = useState<string>("");
+    const [error, setError] = useState< Error | null >(null);
     const [loadingData, setLoadingData] = useState<boolean>(true);
 
 	useEffect(() => {
 		const fetchAsync = async () => {
 			const resp = await Api.loadUsers();
-            if (resp.success) {
-                if (resp.data !== undefined) {
-                    setUsers(resp.data);
-                } else {
-                    setError('Undefined response without error');
-                }
+            if (resp.status === 200) {
+                setUsers(resp.data);
             } else {
-                if (resp.error !== undefined) {
-                    setError(resp.error.message ?? 'Something really bad happened here..');
-                } else {
-                    setError('Response failed without error message');
-                }
+                setError({ message: resp.detail, title: resp.title });
             }
             setLoadingData(false);
 		}
@@ -47,12 +39,13 @@ const UserList = () => {
                     {
                         (loadingData) ? 
                             <Loadingspinner themeInverse={themeInverse} />
-                        : error !== "" || users === null ?
-                            <Errormessage message={error} />
-                        :
+                        : error !== null ?
+                            <Errormessage error={error} />
+                        :  users !== null ?
                             users.map(user => {
                                 return <Link to={`/users/${user.id}`} key={user.id} className={`list-group-item list-group-item-${theme} list-group-item-action`}>{user.name}</Link>
                             })
+                        : null
                     }
                 </div>
             </div>

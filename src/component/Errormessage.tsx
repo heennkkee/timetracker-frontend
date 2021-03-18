@@ -1,12 +1,17 @@
-type ErrormessageProps = {
+export type Error = {
     message: string
+    title: string
 }
 
-const Errormessage = ({ message }: ErrormessageProps) => {
+type ErrormessageProps = {
+    error: Error
+}
+
+const Errormessage = ({error}: ErrormessageProps) => {
     return (
         <p className="lead">
-            <span className="bold text-danger">Error: </span>
-            {message}
+            <span className="bold text-danger">{error.title}: </span>
+            {error.message}
         </p>
     )
 }

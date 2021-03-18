@@ -11,7 +11,7 @@ class Cookies {
         document.cookie = `${name}=${value}; expires=${date.toUTCString()}; path=${path}`;
     }
 
-    static get(name: string) {
+    static get(name: string, defValue: string | undefined = undefined) {
 
         let parts;
         if (document.cookie.indexOf(';') > -1) {

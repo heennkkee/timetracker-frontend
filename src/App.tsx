@@ -25,7 +25,7 @@ function App() {
 
 	const [mode, setMode] = useState<Theme>(defaultMode);
 
-	const [session, setSession] = useState<string>("");
+	const [session, setSession] = useState<string>(Cookies.get('session') ?? "");
 
 	const toggleMode = () => {
 		let newMode = (mode === Theme.Light) ? Theme.Dark : Theme.Light;
@@ -41,8 +41,11 @@ function App() {
 			<Router>
 				<div className={`container bg-${theme} text-${themeInverse}`}>
 					<Header />
-					<button onClick={async () => { let sess = await API.login(); setSession(sess); }}>Login</button>
-					<button onClick={() => { API.logout(session); setSession(""); }}>Logout</button>
+					<p>	
+						<button onClick={async () => { let sess = await API.login(); setSession(sess); }}>Login</button>
+						<button onClick={async () => { let res = await API.logout(""); console.log(res); setSession(""); }}>Logout</button>
+						<code>{session}</code>
+					</p>
 					<main>
 						<Switch>
 							<Route exact path="/users/:userId">

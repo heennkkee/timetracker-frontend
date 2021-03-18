@@ -3,12 +3,12 @@ import Api from '../helper/Api';
 import { useParams } from 'react-router-dom';
 import { Theme, ThemeContext } from '../context/ThemeContext';
 import Loadingspinner from '../component/Loadingspinner';
-import Errormessage from '../component/Errormessage';
+import Errormessage, { Error } from '../component/Errormessage';
 
 
 const User = () => {
     const [user, setUser] = useState<null | any>(null);
-    const [error, setError] = useState<string>("");
+    const [error, setError] = useState<Error | null>(null);
     const [loadingData, setLoadingData] = useState<boolean>(true);
 
     const { userId } = useParams<{ userId: string }>();
@@ -16,12 +16,10 @@ const User = () => {
 	useEffect(() => {
 		const fetchAsync = async () => {
 			const resp = await Api.loadUser(parseInt(userId));
-            if (resp.success) {
-                setUser((resp as any).data);
+            if (resp.status === 200) {
+                setUser(resp.data);
             } else {
-                if (resp.error !== undefined && resp.error.message !== undefined) {
-                    setError(resp.error.message ?? 'Something really shady went wrong..');
-                }
+                setError({ message: resp.detail, title: resp.title });
             }
 
             setLoadingData(false);
@@ -33,7 +31,7 @@ const User = () => {
 
     const updateUser = async () => {
 
-        await Api.updateUser( { id: parseInt(userId) }, { name: user.name, email: user.email });
+        await Api.updateUser( { userid: parseInt(userId) }, { name: user.name, email: user.email });
     }
 
     
@@ -49,8 +47,8 @@ const User = () => {
                     (loadingData) ? 
                         <Loadingspinner themeInverse={themeInverse} />
                     : 
-                    (error !== "") ? 
-                        <Errormessage message={error} />
+                    (error !== null) ? 
+                        <Errormessage error={error} />
                     :
                     <>
                         <div className="mb-3 row">
