@@ -1,14 +1,16 @@
-import { useContext } from 'react';
+import React, { useContext } from 'react';
 
 import { Link, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 
 import { ThemeContext, Theme } from '../context/ThemeContext';
 
+import Button from '../component/Button';
+
+
 const Header = () => {
     const ThemeCtxt = useContext(ThemeContext);
     const theme = ( ThemeCtxt.mode === Theme.Dark ) ? 'dark' : 'light';
-    const themeInverse = ( ThemeCtxt.mode === Theme.Dark ) ? 'light' : 'dark';
 
     const AuthCtxt = useContext(AuthContext);
 
@@ -22,7 +24,7 @@ const Header = () => {
             <div className="row">
                 <nav className={`navbar navbar-${theme} bg-${theme} navbar-expand-lg`}>
                     <Link to="/" className="navbar-brand">
-                        <img className="d-inlineblock align-top" src="/logo192x192.png" height="30" width="30" alt="Flying money logo."></img> Let's track some time!
+                        <img className="d-inlineblock align-top" src="/logo192x192.png" height="30" width="30" alt="Flying money logo."></img> <span className="lead">Let's track some time!</span>
                     </Link>
                     <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
                         <span className="navbar-toggler-icon"></span>
@@ -36,20 +38,16 @@ const Header = () => {
                         <div className="form-inline">
                             {
                                 AuthCtxt.authenticated ? 
-                                    <button className={`btn btn-${themeInverse} me-2`} onClick={async () => { await AuthCtxt.logout(); }}>Logout</button>
+                                    <Button id='logout-button' label='Logout' onClick={async () => { await AuthCtxt.logout(); }} />
                                 :
-                                    <button className={`btn btn-${themeInverse} me-2`} onClick={async () => { await AuthCtxt.login(); }}>Login</button>
+                                    null
                             }
-                            <button className={`btn btn-${themeInverse}`} onClick={() => {
-                                ThemeCtxt.toggle();
-                            }}>
-                                { ThemeCtxt.mode === Theme.Light ? 'Dark' : 'Light'}
-                            </button>
+                            <Button id='toggleTheme-button' label={ ThemeCtxt.mode === Theme.Light ? 'Dark' : 'Light'} onClick={() => { ThemeCtxt.toggle(); }} />
                         </div>
                     </div>
                 </nav>
                 {
-                    location.length >= 1 ? 
+                    location.length >= 1 && AuthCtxt.authenticated ? 
                         <div aria-label="breadcrumb">
                             <ol className="breadcrumb">
                                 { location.map((link: string, ix: number) => {

@@ -19,8 +19,17 @@ type USERS_PUT_404 = paths["/users/{userid}"]["put"]["responses"]["404"]["conten
 
 type USERS_LIST_200 = paths["/users"]["get"]["responses"]["200"]["content"]["application/json"];
 
-type CHECK_200 = paths["/check"]["get"]["responses"]["200"]["content"]["application/json"];
-type CHECK_401 = paths["/check"]["get"]["responses"]["401"]["content"]["application/json"];
+type CHECK_200 = paths["/auth/check"]["get"]["responses"]["200"]["content"]["application/json"];
+type CHECK_401 = paths["/auth/check"]["get"]["responses"]["401"]["content"]["application/json"];
+
+
+type LOGIN_BODY = paths["/auth/login"]["post"]["requestBody"]["content"]["application/json"];
+type LOGIN_200 = paths["/auth/login"]["post"]["responses"]["200"]["content"]["application/json"];
+type LOGIN_401 = paths["/auth/login"]["post"]["responses"]["401"]["content"]["application/json"];
+
+type LOGOUT_BODY = paths["/auth/logout"]["post"]["requestBody"]["content"]["application/json"];
+type LOGOUT_200 = paths["/auth/logout"]["post"]["responses"]["200"]["content"]["application/json"];
+type LOGOUT_401 = paths["/auth/logout"]["post"]["responses"]["401"]["content"]["application/json"];
 
 type GENERIC_ERROR = {
     status: 500,
@@ -64,26 +73,42 @@ class Api {
         return resp;
     }
 
-    static login = async () => {
-		const resp = await fetch(`${APIURL}/auth/1/login`, { headers: { 'Content-Type': 'application/json' }, credentials: 'include', method: 'POST', body: JSON.stringify({ 'password': 'test' })}).then(resp => resp.json()).then(json => {
-			console.log(json);
-			return (json.data.session);
-		});
+    static login = async (credentials: LOGIN_BODY) => {
+		const resp = await fetch(`${APIURL}/auth/login`, { 
+                headers: { 'Content-Type': 'application/json' }, 
+                credentials: 'include', 
+                method: 'POST', 
+                body: JSON.stringify(credentials)
+            }
+        ).then(resp => resp.json()).then((json: LOGIN_200 | LOGIN_401) => {
+			return json;
+		}).catch((err) => {
+            return { status: 500, detail: `Generic error: ${err.message}.`, title: 'Error' } as GENERIC_ERROR;
+        });
 
         return resp;
 	}
 
-	static logout = async (session: string) => {
-		const resp = await fetch(`${APIURL}/auth/1/logout`, { headers: { 'Content-Type': 'application/json' }, credentials: 'include', method: 'POST', body: JSON.stringify({ "session": session })}).then(resp => resp.json()).then(json => {
+	static logout = async (session: LOGOUT_BODY) => {
+		const resp = await fetch(`${APIURL}/auth/logout`, { 
+            headers: { 'Content-Type': 'application/json' }, 
+            credentials: 'include', 
+            method: 'POST', 
+            body: JSON.stringify(session)
+        }).then(resp => resp.json()).then((json: LOGOUT_200 | LOGOUT_401) => {
 			return json;
-		});
+		}).catch((err) => {
+            return { status: 500, detail: `Generic error: ${err.message}.`, title: 'Error' } as GENERIC_ERROR;
+        });
 
         return resp;
 	}
 
     static check = async() => {
-        const resp = await fetch(`${APIURL}/check`, { headers: { 'Content-Type': 'application/json' }, credentials: 'include', method: 'GET'}).then(resp => resp.json()).then((json: CHECK_200 | CHECK_401) => {
+        const resp = await fetch(`${APIURL}/auth/check`, { headers: { 'Content-Type': 'application/json' }, credentials: 'include', method: 'GET'}).then(resp => resp.json()).then((json: CHECK_200 | CHECK_401) => {
             return json;
+        }).catch((err) => {
+            return { status: 500, detail: `Generic error: ${err.message}.`, title: 'Error' } as GENERIC_ERROR;
         });
         return resp;
     }

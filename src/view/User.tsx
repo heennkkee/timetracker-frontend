@@ -1,15 +1,18 @@
-import { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState } from 'react';
 import Api from '../helper/Api';
 import { useParams } from 'react-router-dom';
-import { Theme, ThemeContext } from '../context/ThemeContext';
 import Loadingspinner from '../component/Loadingspinner';
 import Errormessage, { Error } from '../component/Errormessage';
-
+import Input from '../component/Input'
+import Button from '../component/Button'
 
 const User = () => {
     const [user, setUser] = useState<null | any>(null);
-    const [error, setError] = useState<Error | null>(null);
+    const [loadingError, setLoadingError] = useState<Error | null>(null);
+    const [saveError, setSaveError] = useState<Error | null>(null);
     const [loadingData, setLoadingData] = useState<boolean>(true);
+
+    const [ sendApiReply, setSendingApiReply ] = useState(false);
 
     const { userId } = useParams<{ userId: string }>();
 
@@ -19,7 +22,7 @@ const User = () => {
             if (resp.status === 200) {
                 setUser(resp.data);
             } else {
-                setError({ message: resp.detail, title: resp.title });
+                setLoadingError({ message: resp.detail, title: resp.title });
             }
 
             setLoadingData(false);
@@ -29,59 +32,55 @@ const User = () => {
 
 	}, [ userId ]);
 
-    const updateUser = async () => {
+    const updateUser = async(ev: React.FormEvent) => {
+        ev.preventDefault();
 
-        await Api.updateUser( { userid: parseInt(userId) }, { name: user.name, email: user.email });
-    }
+        setSendingApiReply(true);
+
+        const resp = await Api.updateUser( { userid: parseInt(userId) }, { name: user.name, email: user.email });
+        setSendingApiReply(false);
+
+        
+        if (resp.status !== 200) {
+            setSaveError({ title: resp.title, message: resp.detail });
+        }
+    };    
 
     
-    const ThemeCtxt = useContext(ThemeContext);
-    const theme = ( ThemeCtxt.mode === Theme.Dark ) ? 'dark' : 'light';
-    const themeInverse = ( ThemeCtxt.mode === Theme.Dark ) ? 'light' : 'dark';
-    
+
 
     return (
         <div className="row">
             <div className="col-12">
                 {
                     (loadingData) ? 
-                        <Loadingspinner themeInverse={themeInverse} />
+                        <Loadingspinner />
                     : 
-                    (error !== null) ? 
-                        <Errormessage error={error} />
+                    (loadingError !== null) ? 
+                        <Errormessage error={loadingError} />
                     :
                     <>
-                        <div className="mb-3 row">
-                            <label htmlFor="userId" className="col-sm-2 col-form-label">User ID</label>
-                            <div className="col-sm-10">
-                                <input type="number" readOnly disabled className={`form-control bg-${theme} text-${themeInverse}`} id="userId" value={user.id} />
+                        <form onSubmit={updateUser}>
+                            <Input id="name-input" label="Name" type="string" value={user.name} required={true} setValue={(name: string) => {
+                                setUser((user: any) => ({ ...user, name: name}));
+                            }} />
+                            <Input id="email-input" label="Email" type="string" value={user.email} required={true} setValue={(email: string) => {
+                                setUser((user: any) => ({ ...user, email: email}));
+                            }} />
+                            <div className="mb-3">
+                                <Button type="submit" disabled={loadingData || sendApiReply} btnStyle="success" label="Save" id="save-button" onClick={() => {}} />
                             </div>
-                        </div>
-                        <div className="mb-3 row">
-                            <label htmlFor="userName" className="col-sm-2 col-form-label">Name</label>
-                            <div className="col-sm-10">
-                                <input type="text" className={`form-control bg-${theme} text-${themeInverse}`} id="userName" value={user.name} onChange={(ev) => {
-                                    setUser((user: any) => ({ ...user, name: ev.target.value }));
-                                }} />
-                            </div>
-                        </div>
-                        <div className="mb-3 row">
-                            <label htmlFor="userEmail" className="col-sm-2 col-form-label">User ID</label>
-                            <div className="col-sm-10">
-                                <input type="email" className={`form-control bg-${theme} text-${themeInverse}`} id="userEmail" value={user.email} onChange={(ev) => {
-                                    setUser((user: any) => ({ ...user, email: ev.target.value }));
-                                }} />
-                            </div>
-                        </div>
-                        <div className="row">
-                            <div className="col-10 offset-sm-2">
-                                <button type="submit" className="btn btn-success ml-auto" onClick={updateUser}>Save</button>
-                            </div>
-
-                        </div>
+                        </form>
                     </>
                 }
             </div>
+            { (saveError !== null ) ?
+                    <div className="col-12">
+                        <Errormessage error={saveError} />
+                    </div>
+                :
+                    null
+            }
         </div>
     )
 }

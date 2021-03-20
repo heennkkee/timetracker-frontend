@@ -18,13 +18,13 @@ export interface paths {
     get: operations["clockings.list_users_all_clockings"];
     post: operations["clockings.add"];
   };
-  "/check": {
+  "/auth/check": {
     get: operations["auth.check"];
   };
-  "/auth/{userid}/login": {
+  "/auth/login": {
     post: operations["auth.login"];
   };
-  "/auth/{userid}/logout": {
+  "/auth/logout": {
     post: operations["auth.logout"];
   };
 }
@@ -255,12 +255,6 @@ export interface operations {
     };
   };
   "auth.login": {
-    parameters: {
-      path: {
-        /** Userid */
-        userid: components["parameters"]["UserId"];
-      };
-    };
     responses: {
       /** Response with token */
       200: {
@@ -281,18 +275,13 @@ export interface operations {
     requestBody: {
       content: {
         "application/json": {
-          password?: string;
+          password: string;
+          "e-mail": string;
         };
       };
     };
   };
   "auth.logout": {
-    parameters: {
-      path: {
-        /** Userid */
-        userid: components["parameters"]["UserId"];
-      };
-    };
     responses: {
       /** User is logged out */
       200: {
@@ -306,6 +295,7 @@ export interface operations {
           };
         };
       };
+      401: components["responses"]["NotAuthorized"];
     };
     requestBody: {
       content: {

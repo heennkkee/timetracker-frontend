@@ -3,8 +3,8 @@ import React from 'react';
 interface IAuthContext {
     authenticated: boolean,
     session?: string,
-    logout: Function,
-    login: Function
+    setSession: Function,
+    logout: Function
 }
 
-export const AuthContext = React.createContext<IAuthContext>({ authenticated: false, login: () => {}, logout: () => {} });
+export const AuthContext = React.createContext<IAuthContext>({ authenticated: false, logout: () => {}, setSession: () => {} });

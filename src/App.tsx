@@ -14,6 +14,7 @@ import { AuthContext } from './context/AuthContext';
 const User = React.lazy(() => import("./view/User"));
 const UserList = React.lazy(() => import("./view/UserList"));
 const FourOhFour = React.lazy(() => import("./view/FourOhFour"));
+const Login = React.lazy(() => import("./view/Login"));
 
 function App() {
 
@@ -28,6 +29,12 @@ function App() {
 		return setTheme;
 	});
 
+
+	const [session, setSession] = useState<string>(() => {
+		return Cookies.get('session') ?? "";
+	});
+
+
 	useEffect(() => {
 		const asyncCheckAuth = async () => {
 			console.log("Checking authentication in background");
@@ -38,12 +45,13 @@ function App() {
 			}
 		}
 
-		asyncCheckAuth();
-	}, []);
+		// This can be improved... A /check request is sent after initial login now. Feels kind of unnecessary
+		if (session !== "") {
+			asyncCheckAuth();
+		}
+		
+	}, [ session ]);
 
-	const [session, setSession] = useState<string>(() => {
-		return Cookies.get('session') ?? "";
-	});
 
 	const toggleMode = () => {
 		let newMode = (mode === Theme.Light) ? Theme.Dark : Theme.Light;
@@ -52,19 +60,21 @@ function App() {
 	}
 
 	const theme = ( mode === Theme.Dark ) ? 'dark' : 'light';
-    const themeInverse = ( mode === Theme.Dark ) ? 'light' : 'dark';
+    const textColor = ( mode === Theme.Dark ) ? 'white-50' : 'dark';
 
 	return (
 		<ThemeContext.Provider value={{ mode: mode, toggle: toggleMode }}>
-			<AuthContext.Provider value={{ session: session, authenticated: session !== '', login: async () => { let sess = await API.login(); setSession(sess); }, logout: async () => { await API.logout(""); setSession(""); } }}>
+			<AuthContext.Provider value={{ session: session, setSession: (newSess: string) => { setSession(newSess); }, authenticated: session !== '', logout: async () => { await API.logout({ "session": session }); setSession(""); } }}>
 
 				<Router>
-					<div className={`container-lg bg-${theme} text-${themeInverse}`}>
+					<div className={`container-lg bg-${theme} text-${textColor}`}>
 						<Header />
 						<main>
 							{
 								session === '' ?
-									<p>Login to access content</p>
+									<Suspense fallback={''}>
+										<Login />
+									</Suspense>
 								:
 									<Switch>
 										<Route exact path="/users/:userId">

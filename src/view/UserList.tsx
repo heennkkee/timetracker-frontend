@@ -30,7 +30,6 @@ const UserList = () => {
 
     const ThemeCtxt = useContext(ThemeContext);
     const theme = ( ThemeCtxt.mode === Theme.Dark ) ? 'dark' : 'light';
-    const themeInverse = ( ThemeCtxt.mode === Theme.Dark ) ? 'light' : 'dark';
     
     return (
         <div className="row">
@@ -38,7 +37,7 @@ const UserList = () => {
                 <div className="list-group">
                     {
                         (loadingData) ? 
-                            <Loadingspinner themeInverse={themeInverse} />
+                            <Loadingspinner />
                         : error !== null ?
                             <Errormessage error={error} />
                         :  users !== null ?

@@ -25,13 +25,8 @@ class Cookies {
     }
 
     static delete(name: string, path: string = "/") {
-        const date = new Date();
-
-        // Set it expire in -1 days
-        date.setTime(date.getTime() + (-1 * 24 * 60 * 60 * 1000));
-    
         // Set it
-        document.cookie = `${name}=; expires=${date.toUTCString()}; path=${path}`;
+        document.cookie = `${name}=; Max-Age=-1; path=${path}`;
     }
 }
 
