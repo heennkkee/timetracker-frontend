@@ -6,13 +6,17 @@ import Errormessage, { Error } from '../component/Errormessage';
 import Input from '../component/Input'
 import Button from '../component/Button'
 
+import { useHistory } from 'react-router-dom';
+
 const User = () => {
+    let history = useHistory();
+
     const [user, setUser] = useState<null | any>(null);
     const [loadingError, setLoadingError] = useState<Error | null>(null);
-    const [saveError, setSaveError] = useState<Error | null>(null);
+    const [apiReplyError, setApiReplyError] = useState<Error | null>(null);
     const [loadingData, setLoadingData] = useState<boolean>(true);
 
-    const [ sendApiReply, setSendingApiReply ] = useState(false);
+    const [ sendingApiReply, setSendingApiReply ] = useState(false);
 
     const { userId } = useParams<{ userId: string }>();
 
@@ -42,9 +46,41 @@ const User = () => {
 
         
         if (resp.status !== 200) {
-            setSaveError({ title: resp.title, message: resp.detail });
+            setApiReplyError({ title: resp.title, message: resp.detail });
         }
-    };    
+    };
+
+    const setPassword = async() => {
+        const oldPassword = prompt('Old password');
+        const newPassword = prompt('Old password');
+
+        if (oldPassword !== null && newPassword !== null && oldPassword !== '' && newPassword !== '') {
+            setApiReplyError(null);
+            setSendingApiReply(true);
+            const resp = await Api.updateUserPassword({ userid: parseInt(userId) }, { newPassword: newPassword, password: oldPassword });
+            if (resp.status !== 200) {
+                setApiReplyError({ title: resp.title, message: resp.detail });
+            }
+            setSendingApiReply(false);
+        } else {
+            setApiReplyError({ title: 'Missing data', message: 'Both passwords are required!'});
+        }
+    }
+
+    const removeUser = async() => {
+        const conf = window.confirm(`Are you sure you want to remove the user '${user.name}'?`);
+        if (conf) {
+            setApiReplyError(null);
+            setSendingApiReply(true);
+            const resp = await Api.removeUser({ userid: parseInt(userId )});
+            if (resp.status === 200) {
+                history.replace('/users');
+            } else {
+                setSendingApiReply(false);
+                setApiReplyError({ title: resp.title, message: resp.detail });
+            }
+        }
+    }
 
     
 
@@ -68,15 +104,17 @@ const User = () => {
                                 setUser((user: any) => ({ ...user, email: email}));
                             }} />
                             <div className="mb-3">
-                                <Button type="submit" disabled={loadingData || sendApiReply} btnStyle="success" label="Save" id="save-button" onClick={() => {}} />
+                                <Button type="submit" disabled={loadingData || sendingApiReply} btnStyle="success" label="Update" id="update-button" onClick={() => {}} />
+                                <Button btnStyle="info" disabled={loadingData || sendingApiReply} label="Change password" id="change-password-button" onClick={setPassword} />
+                                <Button btnStyle="danger" disabled={loadingData || sendingApiReply} label="Remove user" id="remove-user-button" onClick={removeUser} />
                             </div>
                         </form>
                     </>
                 }
             </div>
-            { (saveError !== null ) ?
+            { (apiReplyError !== null ) ?
                     <div className="col-12">
-                        <Errormessage error={saveError} />
+                        <Errormessage error={apiReplyError} />
                     </div>
                 :
                     null

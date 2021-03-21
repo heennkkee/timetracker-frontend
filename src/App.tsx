@@ -65,47 +65,48 @@ function App() {
 	return (
 		<ThemeContext.Provider value={{ mode: mode, toggle: toggleMode }}>
 			<AuthContext.Provider value={{ session: session, setSession: (newSess: string) => { setSession(newSess); }, authenticated: session !== '', logout: async () => { await API.logout({ "session": session }); setSession(""); } }}>
+				<div className={`allmighty-container allmighty-${theme}`}>
+					<Router>
+						<div className={`min-vh-100 container-lg bg-${theme} text-${textColor} d-flex flex-column`}>
+							<Header />
+							<main style={{flexGrow: 1}}>
+								{
+									session === '' ?
+										<Suspense fallback={''}>
+											<Login />
+										</Suspense>
+									:
+										<Switch>
+											<Route exact path="/users/:userId">
+												<Suspense fallback={''}>
+													<User />
+												</Suspense>
+											</Route>
 
-				<Router>
-					<div className={`container-lg bg-${theme} text-${textColor}`}>
-						<Header />
-						<main>
-							{
-								session === '' ?
-									<Suspense fallback={''}>
-										<Login />
-									</Suspense>
-								:
-									<Switch>
-										<Route exact path="/users/:userId">
-											<Suspense fallback={''}>
-												<User />
-											</Suspense>
-										</Route>
-
-										<Route exact path="/users">
-											<Suspense fallback={''}>
-												<UserList />
-											</Suspense>
-										</Route>
-										
-										<Route exact path="/">
-											<p>
-												Hej
-											</p>
-										</Route>
-										
-										<Route path="/">
-											<Suspense fallback={''}>
-												<FourOhFour />
-											</Suspense>
-										</Route>
-									</Switch>
-								}
-						</main>
-						<Footer />
-					</div>
-				</Router>
+											<Route exact path="/users">
+												<Suspense fallback={''}>
+													<UserList />
+												</Suspense>
+											</Route>
+											
+											<Route exact path="/">
+												<p>
+													Hej
+												</p>
+											</Route>
+											
+											<Route path="/">
+												<Suspense fallback={''}>
+													<FourOhFour />
+												</Suspense>
+											</Route>
+										</Switch>
+									}
+							</main>
+							<Footer />
+						</div>
+					</Router>
+				</div>
 			</AuthContext.Provider>
 		</ThemeContext.Provider>
 	);

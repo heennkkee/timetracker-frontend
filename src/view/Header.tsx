@@ -26,10 +26,10 @@ const Header = () => {
                     <Link to="/" className="navbar-brand">
                         <img className="d-inlineblock align-top" src="/logo192x192.png" height="30" width="30" alt="Flying money logo."></img> <span className="lead">Let's track some time!</span>
                     </Link>
-                    <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <button className="navbar-toggler collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
                         <span className="navbar-toggler-icon"></span>
                     </button>
-                    <div className="collapse navbar-collapse" id="navbarCollapse">
+                    <div className="navbar-collapse collapse" id="navbarCollapse">
                         <ul className="navbar-nav me-auto">
                             <li className="nav-item">
                                 <Link to="/users" className={`nav-link ${location[1] === 'users' ? 'active' : ''}`}>Users</Link>

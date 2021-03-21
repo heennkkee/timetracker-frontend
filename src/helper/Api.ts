@@ -17,6 +17,10 @@ type USERS_PUT_200 = paths["/users/{userid}"]["put"]["responses"]["200"]["conten
 type USERS_PUT_404 = paths["/users/{userid}"]["put"]["responses"]["404"]["content"]["application/json"];
 
 
+type USERS_POST_BODY = paths["/users"]["post"]["requestBody"]["content"]["application/json"];
+type USERS_POST_201 = paths["/users"]["post"]["responses"]["201"]["content"]["application/json"];
+type USERS_POST_400 = paths["/users"]["post"]["responses"]["400"]["content"]["application/json"];
+
 type USERS_LIST_200 = paths["/users"]["get"]["responses"]["200"]["content"]["application/json"];
 
 type CHECK_200 = paths["/auth/check"]["get"]["responses"]["200"]["content"]["application/json"];
@@ -31,6 +35,17 @@ type LOGOUT_BODY = paths["/auth/logout"]["post"]["requestBody"]["content"]["appl
 type LOGOUT_200 = paths["/auth/logout"]["post"]["responses"]["200"]["content"]["application/json"];
 type LOGOUT_401 = paths["/auth/logout"]["post"]["responses"]["401"]["content"]["application/json"];
 
+type UPDATE_PASSWORD_BODY = paths["/users/{userid}/password"]["put"]["requestBody"]["content"]["application/json"];
+type UPDATE_PASSWORD_PATH = paths["/users/{userid}/password"]["put"]["parameters"]["path"];
+type UPDATE_PASSWORD_200 = paths["/users/{userid}/password"]["put"]["responses"]["200"]["content"]["application/json"];
+type UPDATE_PASSWORD_401 = paths["/users/{userid}/password"]["put"]["responses"]["401"]["content"]["application/json"];
+type UPDATE_PASSWORD_404 = paths["/users/{userid}/password"]["put"]["responses"]["404"]["content"]["application/json"];
+
+type USER_REMOVE_PATH = paths["/users/{userid}"]["delete"]["parameters"]["path"]
+type USER_REMOVE_200 = paths["/users/{userid}"]["delete"]["responses"]["200"]["content"]["application/json"];
+type USER_REMOVE_404 = paths["/users/{userid}"]["delete"]["responses"]["404"]["content"]["application/json"];
+type USER_REMOVE_500 = paths["/users/{userid}"]["delete"]["responses"]["500"]["content"]["application/json"];
+
 type GENERIC_ERROR = {
     status: 500,
     detail: string,
@@ -40,6 +55,47 @@ type GENERIC_ERROR = {
 
 
 class Api {
+
+    static removeUser = async(path: USER_REMOVE_PATH) => {
+        const resp = await fetch(`${APIURL}/users/${path.userid}`, { 
+            headers: { 'Content-Type': 'application/json' }, 
+            credentials: 'include', 
+            method: 'DELETE'
+        }).then(resp => resp.json()).then((json: USER_REMOVE_200 | USER_REMOVE_404 | USER_REMOVE_500 ) => {
+            return json;
+        }).catch((err) => {
+            return { status: 500, detail: `Generic error: ${err.message}.`, title: 'Error' } as GENERIC_ERROR;
+        });
+        return resp;
+    }
+
+    static addUser = async(body: USERS_POST_BODY) => {
+        const resp = await fetch(`${APIURL}/users`, { 
+            headers: { 'Content-Type': 'application/json' }, 
+            credentials: 'include', 
+            method: 'POST',
+            body: JSON.stringify(body)
+        }).then(resp => resp.json()).then((json: USERS_POST_201 | USERS_POST_400 ) => {
+            return json;
+        }).catch((err) => {
+            return { status: 500, detail: `Generic error: ${err.message}.`, title: 'Error' } as GENERIC_ERROR;
+        });
+        return resp;
+    }
+
+    static updateUserPassword = async(path: UPDATE_PASSWORD_PATH, body: UPDATE_PASSWORD_BODY) => {
+        const resp = await fetch(`${APIURL}/users/${path.userid}/password`, { 
+            headers: { 'Content-Type': 'application/json' }, 
+            credentials: 'include', 
+            method: 'PUT',
+            body: JSON.stringify(body)
+        }).then(resp => resp.json()).then((json: UPDATE_PASSWORD_200 | UPDATE_PASSWORD_401 | UPDATE_PASSWORD_404 ) => {
+            return json;
+        }).catch((err) => {
+            return { status: 500, detail: `Generic error: ${err.message}.`, title: 'Error' } as GENERIC_ERROR;
+        });
+        return resp;
+    }
 
     static loadUser = async (userid: number) => {
         const resp = await fetch(`${APIURL}/users/${userid}`, { credentials: 'include' }).then(resp => resp.json()).then((jsonResp: USERS_GET_200 | USERS_GET_404) => {

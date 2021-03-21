@@ -1,3 +1,16 @@
+.allmighty-container {
+    height: 100%;
+    width: 100%;
+}
+
+.allmighty-dark {
+    background-color: #171a1d;
+}
+
+.allmighty-light {
+
+}
+
 .input-dark {
     background-color: hsl(0, 0%, 14%) !important;
     border-color: hsl(0, 0%, 10%);
@@ -25,6 +38,26 @@
 
 .button-dark-success:focus {
     background-color: hsl(127deg, 32%, 12%) !important;
+    border-color: hsl(0, 0%, 6%);
+}
+
+.button-dark-info {
+    background-color: hsl(190deg 90% 18%) !important;
+    border-color: hsl(0, 0%, 10%);
+}
+
+.button-dark-info:focus {
+    background-color: hsl(190deg 90% 12%) !important;
+    border-color: hsl(0, 0%, 6%);
+}
+
+.button-dark-danger {
+    background-color: hsl(354deg 70% 18%) !important;
+    border-color: hsl(0, 0%, 10%);
+}
+
+.button-dark-danger:focus {
+    background-color: hsl(354deg 70% 12%) !important;
     border-color: hsl(0, 0%, 6%);
 }
 

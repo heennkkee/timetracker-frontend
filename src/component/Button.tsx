@@ -3,7 +3,7 @@ import { Theme, ThemeContext } from "../context/ThemeContext";
 
 type ButtonProps = {
     type?: 'submit',
-    btnStyle?: 'success',
+    btnStyle?: 'success' | 'info' | 'danger',
     id: string,
     label: string,
     onClick: React.MouseEventHandler<HTMLButtonElement>,

@@ -18,6 +18,9 @@ export interface paths {
     get: operations["clockings.list_users_all_clockings"];
     post: operations["clockings.add"];
   };
+  "/users/{userid}/password": {
+    put: operations["users.update_password"];
+  };
   "/auth/check": {
     get: operations["auth.check"];
   };
@@ -36,9 +39,14 @@ export interface components {
       name: string;
       email: string;
     };
-    UserInput: {
+    NewUserInput: {
       name: string;
       email: string;
+      password: string;
+    };
+    UserInput: {
+      name?: string;
+      email?: string;
     };
     Error: {
       message: string;
@@ -85,6 +93,14 @@ export interface components {
         "application/json": components["schemas"]["DefaultError"];
       };
     };
+    /** Response with just a 200-status code */
+    EmptyOk: {
+      content: {
+        "application/json": {
+          status: 200;
+        };
+      };
+    };
   };
   parameters: {
     /** Userid */
@@ -121,7 +137,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": components["schemas"]["UserInput"];
+        "application/json": components["schemas"]["NewUserInput"];
       };
     };
   };
@@ -241,16 +257,30 @@ export interface operations {
       };
     };
   };
-  "auth.check": {
+  "users.update_password": {
+    parameters: {
+      path: {
+        /** Userid */
+        userid: components["parameters"]["UserId"];
+      };
+    };
     responses: {
-      /** Authentication OK */
-      200: {
-        content: {
-          "application/json": {
-            status?: 200;
-          };
+      200: components["responses"]["EmptyOk"];
+      401: components["responses"]["NotAuthorized"];
+      404: components["responses"]["NotFound"];
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          password?: string;
+          newPassword?: string;
         };
       };
+    };
+  };
+  "auth.check": {
+    responses: {
+      200: components["responses"]["EmptyOk"];
       401: components["responses"]["NotAuthorized"];
     };
   };
