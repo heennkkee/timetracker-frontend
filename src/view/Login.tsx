@@ -11,10 +11,13 @@ const Login = () => {
     
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
-    
+    const [ mfa, setMfa ] = useState<string>("");
+
     const [error, setError] = useState<Error | null>(null);
 
     const [loading, setLoading] = useState(false);
+
+    const [ requestMfa, setRequestMfa ] = useState(false);
     
     const AuthCtxt = useContext(AuthContext);
 
@@ -24,14 +27,24 @@ const Login = () => {
         setLoading(true);
         ev.preventDefault();
 
-        const resp = await Api.login({ "password": password, "e-mail": email});
+        let credentials: { "password": string, "e-mail": string, "mfacode"?: number } = { "password": password, "e-mail": email }; 
+
+        if (mfa !== '') {
+            credentials["mfacode"] = parseInt(mfa);
+        }
+
+        const resp = await Api.login(credentials);
         
         setLoading(false);
 
-        if (resp.status === 200) {
+        if (resp.status === 200) { 
             AuthCtxt.setCurrentUser(resp.data.userid);
             Cookies.set("userid", String(resp.data.userid));
             AuthCtxt.setSession(resp.data.session);
+        } else if (resp.status === 403) {
+            if (resp.detail === "2fa") {
+                setRequestMfa(true);
+            }
         } else {
             setError({ message: resp.detail, title: resp.title });
         }
@@ -44,13 +57,22 @@ const Login = () => {
                 <p>Provide your credentials below to login.</p>
             </div>
             <div className="col-12">
-                <form onSubmit={performLogin}>
-                    <Input label="Email address" type="email" id="email-input" value={email} required={true} setValue={setEmail} />
-                    <Input label="Password" type="password" id="password-input" value={password} required={true} setValue={setPassword} />
-                    <div className="mb-3">
-                        <Button type="submit" disabled={loading} btnStyle="success" label="Login" id="login-button" onClick={() => {}} />
-                    </div>
-                </form>
+                { !requestMfa ? 
+                        <form onSubmit={performLogin}>
+                            <Input label="Email address" type="email" id="email-input" value={email} required={true} setValue={setEmail} />
+                            <Input label="Password" type="password" id="password-input" value={password} required={true} setValue={setPassword} />
+                            <div className="mb-3">
+                                <Button type="submit" disabled={loading} btnStyle="success" label="Login" id="login-button" onClick={() => {}} />
+                            </div>
+                        </form>
+                    :
+                    <form onSubmit={performLogin}>
+                        <Input label="Multifactor code" type="number" id="mfa-input" value={mfa} required={true} setValue={setMfa} />
+                        <div className="mb-3">
+                            <Button type="submit" disabled={loading} btnStyle="success" label="Login" id="login-button" onClick={() => {}} />
+                        </div>
+                    </form>
+                }
             </div>
             { error !== null ? 
                 <div className="col-12">

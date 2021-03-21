@@ -9,7 +9,7 @@ import Loadingspinner from '../component/Loadingspinner';
 type Direction = 'in' | 'out';
 
 const Clockings = () => {
-    const [clockings, setClockings] = useState<null | { id: number, direction: Direction, user_id: number, datetime: string }[]>(null);
+    const [clockings, setClockings] = useState<null | { id: number, direction: Direction, userid: number, datetime: string }[]>(null);
     const [error, setError] = useState< Error | null >(null);
     const [loadingData, setLoadingData] = useState<boolean>(true);
 

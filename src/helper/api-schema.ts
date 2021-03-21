@@ -53,14 +53,14 @@ export interface components {
     };
     DefaultError: {
       detail: string;
-      status: 400 | 401 | 403 | 404;
+      status: 400 | 401 | 404;
       title: string;
       type?: string;
     };
     Clocking: {
       id: number;
       direction: "in" | "out";
-      user_id: number;
+      userid: number;
       datetime: string;
     };
     ClockingInput: {
@@ -302,12 +302,22 @@ export interface operations {
         };
       };
       401: components["responses"]["NotAuthorized"];
+      /** Response to request 2fa authentication if useraccount requires it */
+      403: {
+        content: {
+          "application/json": {
+            status: 403;
+            detail?: "2fa";
+          };
+        };
+      };
     };
     requestBody: {
       content: {
         "application/json": {
           password: string;
           "e-mail": string;
+          mfacode?: number;
         };
       };
     };

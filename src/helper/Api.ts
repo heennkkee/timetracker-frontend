@@ -29,6 +29,7 @@ type CHECK_401 = paths["/auth/check"]["get"]["responses"]["401"]["content"]["app
 
 type LOGIN_BODY = paths["/auth/login"]["post"]["requestBody"]["content"]["application/json"];
 type LOGIN_200 = paths["/auth/login"]["post"]["responses"]["200"]["content"]["application/json"];
+type LOGIN_403 = paths["/auth/login"]["post"]["responses"]["403"]["content"]["application/json"];
 type LOGIN_401 = paths["/auth/login"]["post"]["responses"]["401"]["content"]["application/json"];
 
 type LOGOUT_BODY = paths["/auth/logout"]["post"]["requestBody"]["content"]["application/json"];
@@ -178,7 +179,7 @@ class Api {
                 method: 'POST', 
                 body: JSON.stringify(credentials)
             }
-        ).then(resp => resp.json()).then((json: LOGIN_200 | LOGIN_401) => {
+        ).then(resp => resp.json()).then((json: LOGIN_200 | LOGIN_401 | LOGIN_403) => {
 			return json;
 		}).catch((err) => {
             return { status: 500, detail: `Generic error: ${err.message}.`, title: 'Error' } as GENERIC_ERROR;
