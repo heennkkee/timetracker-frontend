@@ -5,6 +5,7 @@ import { AuthContext } from '../context/AuthContext';
 
 import Input from '../component/Input';
 import Button from '../component/Button';
+import Cookies from '../helper/Cookies';
 
 const Login = () => {
     
@@ -28,6 +29,8 @@ const Login = () => {
         setLoading(false);
 
         if (resp.status === 200) {
+            AuthCtxt.setCurrentUser(resp.data.userid);
+            Cookies.set("userid", String(resp.data.userid));
             AuthCtxt.setSession(resp.data.session);
         } else {
             setError({ message: resp.detail, title: resp.title });

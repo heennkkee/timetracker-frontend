@@ -46,6 +46,19 @@ type USER_REMOVE_200 = paths["/users/{userid}"]["delete"]["responses"]["200"]["c
 type USER_REMOVE_404 = paths["/users/{userid}"]["delete"]["responses"]["404"]["content"]["application/json"];
 type USER_REMOVE_500 = paths["/users/{userid}"]["delete"]["responses"]["500"]["content"]["application/json"];
 
+
+type CLOCKINGS_GET_PATH = paths["/users/{userid}/clockings"]["get"]["parameters"]["path"];
+type CLOCKINGS_GET_QS = paths["/users/{userid}/clockings"]["get"]["parameters"]["query"];
+type CLOCKINGS_GET_200 = paths["/users/{userid}/clockings"]["get"]["responses"]["200"]["content"]["application/json"];
+type CLOCKINGS_GET_404 = paths["/users/{userid}/clockings"]["get"]["responses"]["404"]["content"]["application/json"];
+
+
+type CLOCKINGS_POST_PATH = paths["/users/{userid}/clockings"]["post"]["parameters"]["path"];
+type CLOCKINGS_POST_BODY = paths["/users/{userid}/clockings"]["post"]["requestBody"]["content"]["application/json"];
+type CLOCKINGS_POST_201 = paths["/users/{userid}/clockings"]["post"]["responses"]["201"]["content"]["application/json"];
+type CLOCKINGS_POST_400 = paths["/users/{userid}/clockings"]["post"]["responses"]["400"]["content"]["application/json"];
+type CLOCKINGS_POST_404 = paths["/users/{userid}/clockings"]["post"]["responses"]["404"]["content"]["application/json"];
+
 type GENERIC_ERROR = {
     status: 500,
     detail: string,
@@ -55,6 +68,35 @@ type GENERIC_ERROR = {
 
 
 class Api {
+
+    static addClocking = async(path: CLOCKINGS_POST_PATH, body: CLOCKINGS_POST_BODY) => {
+        let url = `${APIURL}/users/${path.userid}/clockings`;
+        const resp = await fetch(url, { 
+            headers: { 'Content-Type': 'application/json' }, 
+            credentials: 'include', 
+            method: 'POST',
+            body: JSON.stringify(body)
+        }).then(resp => resp.json()).then((json: CLOCKINGS_POST_201 | CLOCKINGS_POST_400 | CLOCKINGS_POST_404 ) => {
+            return json;
+        }).catch((err) => {
+            return { status: 500, detail: `Generic error: ${err.message}.`, title: 'Error' } as GENERIC_ERROR;
+        });
+        return resp;
+    }
+
+    static loadClockings = async(path: CLOCKINGS_GET_PATH, qs: CLOCKINGS_GET_QS) => {
+        let url = `${APIURL}/users/${path.userid}/clockings?limit=${qs.limit}`;
+        const resp = await fetch(url, { 
+            headers: { 'Content-Type': 'application/json' }, 
+            credentials: 'include', 
+            method: 'GET'
+        }).then(resp => resp.json()).then((json: CLOCKINGS_GET_200 | CLOCKINGS_GET_404 ) => {
+            return json;
+        }).catch((err) => {
+            return { status: 500, detail: `Generic error: ${err.message}.`, title: 'Error' } as GENERIC_ERROR;
+        });
+        return resp;
+    }
 
     static removeUser = async(path: USER_REMOVE_PATH) => {
         const resp = await fetch(`${APIURL}/users/${path.userid}`, { 

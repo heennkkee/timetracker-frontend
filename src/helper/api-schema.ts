@@ -296,6 +296,7 @@ export interface operations {
             status: 200;
             data: {
               session?: string;
+              userid?: number;
             };
           };
         };

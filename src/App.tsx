@@ -10,6 +10,7 @@ import API from './helper/Api';
 
 import Cookies from './helper/Cookies';
 import { AuthContext } from './context/AuthContext';
+import Clockings from './view/Clockings';
 
 const User = React.lazy(() => import("./view/User"));
 const UserList = React.lazy(() => import("./view/UserList"));
@@ -32,6 +33,14 @@ function App() {
 
 	const [session, setSession] = useState<string>(() => {
 		return Cookies.get('session') ?? "";
+	});
+
+	const [currentUser, setCurrentUser] = useState<number | undefined>(() => {
+		let id = Cookies.get('userid');
+		if (id === undefined) {
+			return id
+		}
+		return parseInt(id);
 	});
 
 
@@ -62,9 +71,23 @@ function App() {
 	const theme = ( mode === Theme.Dark ) ? 'dark' : 'light';
     const textColor = ( mode === Theme.Dark ) ? 'white-50' : 'dark';
 
+	const authCtxt = {
+		"session": session, 
+		"setSession": (newSess: string) => { setSession(newSess); }, 
+		"authenticated": session !== '', 
+		"logout": async () => { 
+				await API.logout({ "session": session }); 
+				setSession(""); 
+				Cookies.delete("userid");
+				setCurrentUser(undefined); 
+			},
+		"currentUser": currentUser,
+		"setCurrentUser": (newUser: number | undefined) => setCurrentUser(newUser)
+	}
+
 	return (
 		<ThemeContext.Provider value={{ mode: mode, toggle: toggleMode }}>
-			<AuthContext.Provider value={{ session: session, setSession: (newSess: string) => { setSession(newSess); }, authenticated: session !== '', logout: async () => { await API.logout({ "session": session }); setSession(""); } }}>
+			<AuthContext.Provider value={authCtxt}>
 				<div className={`allmighty-container allmighty-${theme}`}>
 					<Router>
 						<div className={`min-vh-100 container-lg bg-${theme} text-${textColor} d-flex flex-column`}>
@@ -88,11 +111,11 @@ function App() {
 													<UserList />
 												</Suspense>
 											</Route>
-											
+
 											<Route exact path="/">
-												<p>
-													Hej
-												</p>
+												<Suspense fallback={''}>
+													<Clockings />
+												</Suspense>
 											</Route>
 											
 											<Route path="/">
