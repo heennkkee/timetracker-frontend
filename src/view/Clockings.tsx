@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import Api from "../helper/Api";
-import Errormessage, { Error } from '../component/Errormessage';
+//import Errormessage, { Error } from '../component/Errormessage';
 import Button from '../component/Button';
 
 import Loadingspinner from '../component/Loadingspinner';
@@ -10,14 +10,14 @@ type Direction = 'in' | 'out';
 
 const Clockings = () => {
     const [clockings, setClockings] = useState<null | { id: number, direction: Direction, userid: number, datetime: string }[]>(null);
-    const [error, setError] = useState< Error | null >(null);
+    //const [error, setError] = useState< Error | null >(null);
     const [loadingData, setLoadingData] = useState<boolean>(true);
 
     const [ sendingApiData, setSendingApiData ] = useState(false);
 
     const [ lastClocking, setLastClocking ] = useState<null | { direction: Direction, datetime: Date }>(null);
     
-    const [ oldPostsLimit, setOldPostsLimit ] = useState(15);
+    const [ oldPostsLimit /*, setOldPostsLimit */ ] = useState(15);
 
     const AuthCtxt = useContext(AuthContext);
 
@@ -35,7 +35,7 @@ const Clockings = () => {
                 if (resp.status === 200) {
                     setClockings(resp.data);
                 } else {
-                    setError({ message: resp.detail, title: resp.title });
+                    //setError({ message: resp.detail, title: resp.title });
                 }
 
                 setLoadingData(false);
