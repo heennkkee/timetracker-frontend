@@ -118,7 +118,7 @@ const Clockings = () => {
                                         null
                                 }
                             </div>
-                            <div className="col-12 mb-3">
+                            <div className="col-12 mb-5">
 
                                 <Button disabled={sendingApiData} 
                                     label={`Clock ${btnDir} @ ${prev5Minute.toLocaleTimeString().split(':').slice(0, 2).join(':')}`} id='toggle-clocking' 
@@ -138,15 +138,20 @@ const Clockings = () => {
                             </div>
 
                             <ManualClockingAddition addClocking={addClocking} disableButtons={sendingApiData} />
-
-                            {clockings?.map((val) => { 
-                                return (
-                                    <p key={val["id"]}>
-                                        {new Date(val["datetime"]).toLocaleString()} - {val["direction"]} 
-                                        <Button id={`remove-clocking-${val['id']}`} disabled={sendingApiData} label='X' btnStyle='danger' onClick={() => { removeClocking(val["id"])}} />
-                                    </p> 
-                                );
-                            })}
+                            
+                            <div className="col-12 mt-4">
+                                <h4>Some clockings</h4>
+                                <div className="row">
+                                    {clockings?.map((val) => { 
+                                        return (
+                                            <div key={val["id"]} className="d-flex justify-content-between col-12 mb-4 align-items-center">
+                                                <span><i>{new Date(val["datetime"]).toLocaleString()}</i> - <b>{val["direction"]}</b></span>
+                                                <Button id={`remove-clocking-${val['id']}`} disabled={sendingApiData} label='X' btnStyle='danger' onClick={() => { removeClocking(val["id"])}} />
+                                            </div> 
+                                        );
+                                    })}
+                                </div>
+                            </div>
                         </div>
                     )
                 }
