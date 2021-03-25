@@ -119,21 +119,19 @@ const Clockings = () => {
                                 }
                             </div>
                             <div className="col-12 mb-3">
+                                <h4>Clock {btnDir}</h4>
                                 <Button disabled={sendingApiData} 
-                                    label={`Clock ${btnDir} now`} id='toggle-clocking' 
-                                    btnStyle={btnStyle} 
-                                    onClick={() => { addClocking(btnDir) }} 
-                                />
-                            </div>
-                            <div className="col-12 mb-5">
-
-                                <Button disabled={sendingApiData} 
-                                    label={`Clock ${btnDir} @ ${prev5Minute.toLocaleTimeString().split(':').slice(0, 2).join(':')}`} id='toggle-clocking' 
+                                    label={`@ ${prev5Minute.toLocaleTimeString().split(':').slice(0, 2).join(':')}`} id='toggle-clocking' 
                                     btnStyle={btnStyle} 
                                     onClick={() => { addClocking(btnDir, prev5Minute) }} 
                                 />
                                 <Button disabled={sendingApiData} 
-                                    label={`Clock ${btnDir} @ ${next5Minute.toLocaleTimeString().split(':').slice(0, 2).join(':')}`} id='toggle-clocking' 
+                                    label={`Now`} id='toggle-clocking' 
+                                    btnStyle={btnStyle} 
+                                    onClick={() => { addClocking(btnDir) }} 
+                                />
+                                <Button disabled={sendingApiData} 
+                                    label={`@ ${next5Minute.toLocaleTimeString().split(':').slice(0, 2).join(':')}`} id='toggle-clocking' 
                                     btnStyle={btnStyle} 
                                     onClick={() => { addClocking(btnDir, next5Minute) }} 
                                 />
