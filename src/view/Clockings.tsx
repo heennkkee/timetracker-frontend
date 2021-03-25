@@ -28,16 +28,14 @@ const Clockings = () => {
         return new Date(new Date().setMinutes(new Date().getMinutes() + 5 - (new Date().getMinutes() % 5), 0, 0));
     });
 
-
-    // Write proper timeout for this?
-    useEffect(() => {
-        setInterval(() => {
-            console.log("updating clock times");
-            const now = new Date();
-            setPrev5Minute(new Date(new Date().setMinutes(now.getMinutes() - (now.getMinutes() % 5), 0, 0)));
-            setNext5Minute(new Date(new Date().setMinutes(now.getMinutes() + 5 - (now.getMinutes() % 5), 0, 0)));
-        }, 30000);
-    }, []);
+    
+    // Interval was leaking, do something proper sometime..
+    const update5Minutes = () => {
+        console.log("updating clock times");
+        const now = new Date();
+        setPrev5Minute(new Date(new Date().setMinutes(now.getMinutes() - (now.getMinutes() % 5), 0, 0)));
+        setNext5Minute(new Date(new Date().setMinutes(now.getMinutes() + 5 - (now.getMinutes() % 5), 0, 0)));
+    }
 
     const AuthCtxt = useContext(AuthContext);
 
@@ -75,7 +73,8 @@ const Clockings = () => {
                     setClockings([resp.data]);
                 }
             }
-
+            update5Minutes();
+            
             setSendingApiData(false);
         }
     }
@@ -91,7 +90,8 @@ const Clockings = () => {
                     setClockings([]);
                 }
             }
-
+            update5Minutes();
+            
             setSendingApiData(false);
         }
     }
