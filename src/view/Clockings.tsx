@@ -112,11 +112,18 @@ const Clockings = () => {
                                 {lastClocking !== null ? 
                                         <>
                                             <p key="status" className="lead">You are currently clocked <b>{lastClocking.direction ?? 'out'}</b>.</p>
-                                            <p key="last-clock">You clocked {lastClocking.direction ?? 'out'} at {lastClocking.datetime.toLocaleString()}.</p>
+                                            <p key="last-clock">You clocked {lastClocking.direction ?? 'out'} at <i>{lastClocking.datetime.toLocaleString()}</i>.</p>
                                         </>
                                     :
                                         null
                                 }
+                            </div>
+                            <div className="col-12 mb-3">
+                                <Button disabled={sendingApiData} 
+                                    label={`Clock ${btnDir} now`} id='toggle-clocking' 
+                                    btnStyle={btnStyle} 
+                                    onClick={() => { addClocking(btnDir) }} 
+                                />
                             </div>
                             <div className="col-12 mb-5">
 
@@ -124,11 +131,6 @@ const Clockings = () => {
                                     label={`Clock ${btnDir} @ ${prev5Minute.toLocaleTimeString().split(':').slice(0, 2).join(':')}`} id='toggle-clocking' 
                                     btnStyle={btnStyle} 
                                     onClick={() => { addClocking(btnDir, prev5Minute) }} 
-                                />
-                                <Button disabled={sendingApiData} 
-                                    label={`Clock ${btnDir} now`} id='toggle-clocking' 
-                                    btnStyle={btnStyle} 
-                                    onClick={() => { addClocking(btnDir) }} 
                                 />
                                 <Button disabled={sendingApiData} 
                                     label={`Clock ${btnDir} @ ${next5Minute.toLocaleTimeString().split(':').slice(0, 2).join(':')}`} id='toggle-clocking' 
