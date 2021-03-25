@@ -38,11 +38,11 @@ const Header = () => {
                         <div className="form-inline">
                             {
                                 AuthCtxt.authenticated ? 
-                                    <Button id='logout-button' label='Logout' onClick={async () => { await AuthCtxt.logout(); }} />
+                                    <Button spaceToLeft={true} id='logout-button' label='Logout' onClick={async () => { await AuthCtxt.logout(); }} />
                                 :
                                     null
                             }
-                            <Button id='toggleTheme-button' label={ ThemeCtxt.mode === Theme.Light ? 'Dark' : 'Light'} onClick={() => { ThemeCtxt.toggle(); }} />
+                            <Button spaceToLeft={true} id='toggleTheme-button' label={ ThemeCtxt.mode === Theme.Light ? 'Dark' : 'Light'} onClick={() => { ThemeCtxt.toggle(); }} />
                         </div>
                     </div>
                 </nav>
