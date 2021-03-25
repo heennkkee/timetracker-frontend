@@ -10,7 +10,7 @@ type InputProps = {
 
 const ManualClockingAddition = (props: InputProps) => {
 
-    const [date, setDate] = useState("");
+    const [date, setDate] = useState(new Date().toLocaleDateString());
     const [time, setTime] = useState("");
 
     return (
