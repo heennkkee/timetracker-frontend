@@ -18,6 +18,10 @@ export interface paths {
     get: operations["clockings.list_users_all_clockings"];
     post: operations["clockings.add"];
   };
+  "/users/{userid}/clockings/{clockingid}": {
+    /** Removes a clocking */
+    delete: operations["clockings.remove_clocking"];
+  };
   "/users/{userid}/password": {
     put: operations["users.update_password"];
   };
@@ -105,6 +109,8 @@ export interface components {
   parameters: {
     /** Userid */
     UserId: number;
+    /** ID of clocking */
+    ClockingId: number;
   };
 }
 
@@ -255,6 +261,29 @@ export interface operations {
       content: {
         "application/json": components["schemas"]["ClockingInput"];
       };
+    };
+  };
+  /** Removes a clocking */
+  "clockings.remove_clocking": {
+    parameters: {
+      path: {
+        /** Userid */
+        userid: components["parameters"]["UserId"];
+        /** ID of clocking */
+        clockingid: components["parameters"]["ClockingId"];
+      };
+    };
+    responses: {
+      /** Clocking was removed */
+      200: {
+        content: {
+          "application/json": {
+            status: 200;
+          };
+        };
+      };
+      404: components["responses"]["NotFound"];
+      500: components["responses"]["ServerError"];
     };
   };
   "users.update_password": {

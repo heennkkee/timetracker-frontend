@@ -79,6 +79,22 @@ const Clockings = () => {
             setSendingApiData(false);
         }
     }
+
+    const removeClocking = async (id: number) => {
+        if (AuthCtxt.currentUser !== undefined) {
+            setSendingApiData(true);
+            const resp = await Api.removeClocking({ userid: AuthCtxt.currentUser, clockingid: id });
+            if (resp.status === 200) {
+                if (clockings !== null) {
+                    setClockings([ ...clockings.filter(clocking => clocking.id !== id) ]);
+                } else {
+                    setClockings([]);
+                }
+            }
+
+            setSendingApiData(false);
+        }
+    }
     
     const btnStyle = (lastClocking?.direction ?? 'out') === 'in' ? 'danger' : 'success';
     const btnDir = (lastClocking?.direction ?? 'out') === 'in' ? 'out' : 'in';
@@ -123,7 +139,14 @@ const Clockings = () => {
 
                             <ManualClockingAddition addClocking={addClocking} disableButtons={sendingApiData} />
 
-                            {clockings?.map((val) => { return <p key={val["id"]}>{new Date(val["datetime"]).toLocaleString()} - {val["direction"]}</p> })}
+                            {clockings?.map((val) => { 
+                                return (
+                                    <p key={val["id"]}>
+                                        {new Date(val["datetime"]).toLocaleString()} - {val["direction"]} 
+                                        <Button id={`remove-clocking-${val['id']}`} disabled={sendingApiData} label='X' btnStyle='danger' onClick={() => { removeClocking(val["id"])}} />
+                                    </p> 
+                                );
+                            })}
                         </div>
                     )
                 }

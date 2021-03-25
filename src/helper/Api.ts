@@ -60,6 +60,11 @@ type CLOCKINGS_POST_201 = paths["/users/{userid}/clockings"]["post"]["responses"
 type CLOCKINGS_POST_400 = paths["/users/{userid}/clockings"]["post"]["responses"]["400"]["content"]["application/json"];
 type CLOCKINGS_POST_404 = paths["/users/{userid}/clockings"]["post"]["responses"]["404"]["content"]["application/json"];
 
+type CLOCKINGS_DELETE_PATH = paths["/users/{userid}/clockings/{clockingid}"]["delete"]["parameters"]["path"];
+type CLOCKINGS_DELETE_200 = paths["/users/{userid}/clockings/{clockingid}"]["delete"]["responses"]["200"]["content"]["application/json"];
+type CLOCKINGS_DELETE_404 = paths["/users/{userid}/clockings/{clockingid}"]["delete"]["responses"]["404"]["content"]["application/json"];
+type CLOCKINGS_DELETE_500 = paths["/users/{userid}/clockings/{clockingid}"]["delete"]["responses"]["500"]["content"]["application/json"];
+
 type GENERIC_ERROR = {
     status: 500,
     detail: string,
@@ -69,6 +74,20 @@ type GENERIC_ERROR = {
 
 
 class Api {
+
+    static removeClocking = async(path: CLOCKINGS_DELETE_PATH) => {
+        let url = `${APIURL}/users/${path.userid}/clockings/${path.clockingid}`;
+        const resp = await fetch(url, { 
+            headers: { 'Content-Type': 'application/json' }, 
+            credentials: 'include', 
+            method: 'DELETE'
+        }).then(resp => resp.json()).then((json: CLOCKINGS_DELETE_200 | CLOCKINGS_DELETE_404 | CLOCKINGS_DELETE_500 ) => {
+            return json;
+        }).catch((err) => {
+            return { status: 500, detail: `Generic error: ${err.message}.`, title: 'Error' } as GENERIC_ERROR;
+        });
+        return resp;
+    }
 
     static addClocking = async(path: CLOCKINGS_POST_PATH, body: CLOCKINGS_POST_BODY) => {
         let url = `${APIURL}/users/${path.userid}/clockings`;
