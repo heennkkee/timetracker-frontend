@@ -11,7 +11,7 @@ import { useHistory } from 'react-router-dom';
 const User = () => {
     let history = useHistory();
 
-    const [user, setUser] = useState<null | any>(null);
+    const [user, setUser] = useState<null | { id: number, name: string, email: string }>(null);
     const [loadingError, setLoadingError] = useState<Error | null>(null);
     const [apiReplyError, setApiReplyError] = useState<Error | null>(null);
     const [loadingData, setLoadingData] = useState<boolean>(true);
@@ -39,14 +39,16 @@ const User = () => {
     const updateUser = async(ev: React.FormEvent) => {
         ev.preventDefault();
 
-        setSendingApiReply(true);
-
-        const resp = await Api.updateUser( { userid: parseInt(userId) }, { name: user.name, email: user.email });
-        setSendingApiReply(false);
-
-        
-        if (resp.status !== 200) {
-            setApiReplyError({ title: resp.title, message: resp.detail });
+        if (user !== null) {
+            setSendingApiReply(true);
+    
+            const resp = await Api.updateUser( { userid: parseInt(userId) }, { name: user.name, email: user.email });
+            setSendingApiReply(false);
+    
+            
+            if (resp.status !== 200) {
+                setApiReplyError({ title: resp.title, message: resp.detail });
+            }
         }
     };
 
@@ -68,16 +70,18 @@ const User = () => {
     }
 
     const removeUser = async() => {
-        const conf = window.confirm(`Are you sure you want to remove the user '${user.name}'?`);
-        if (conf) {
-            setApiReplyError(null);
-            setSendingApiReply(true);
-            const resp = await Api.removeUser({ userid: parseInt(userId )});
-            if (resp.status === 200) {
-                history.replace('/users');
-            } else {
-                setSendingApiReply(false);
-                setApiReplyError({ title: resp.title, message: resp.detail });
+        if (user !== null) {
+            const conf = window.confirm(`Are you sure you want to remove the user '${user.name}'?`);
+            if (conf) {
+                setApiReplyError(null);
+                setSendingApiReply(true);
+                const resp = await Api.removeUser({ userid: parseInt(userId )});
+                if (resp.status === 200) {
+                    history.replace('/users');
+                } else {
+                    setSendingApiReply(false);
+                    setApiReplyError({ title: resp.title, message: resp.detail });
+                }
             }
         }
     }
@@ -97,10 +101,10 @@ const User = () => {
                     :
                     <>
                         <form onSubmit={updateUser}>
-                            <Input id="name-input" label="Name" type="string" value={user.name} required={true} setValue={(name: string) => {
+                            <Input id="name-input" label="Name" type="string" value={user?.name ?? ""} required={true} setValue={(name: string) => {
                                 setUser((user: any) => ({ ...user, name: name}));
                             }} />
-                            <Input id="email-input" label="Email" type="string" value={user.email} required={true} setValue={(email: string) => {
+                            <Input id="email-input" label="Email" type="string" value={user?.email ?? ""} required={true} setValue={(email: string) => {
                                 setUser((user: any) => ({ ...user, email: email}));
                             }} />
                             <div className="mb-3">
