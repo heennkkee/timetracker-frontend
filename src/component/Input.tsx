@@ -1,14 +1,17 @@
 import { useContext } from "react";
 import { Theme, ThemeContext } from "../context/ThemeContext";
 
+type SupportedInputTypes = 'email' | 'password' | 'string' | 'number' | 'date' | 'time';
+
 type InputProps = {
     label: string,
-    type: 'email' | 'password' | 'string' | 'number' | 'date' | 'time',
+    type: SupportedInputTypes,
     id: string,
     required?: boolean,
     setValue: Function,
     value: string | number | null,
-    max?: string
+    max?: string,
+    autoComplete?: string
 }
 
 const Input = (props: InputProps) => {
@@ -20,10 +23,19 @@ const Input = (props: InputProps) => {
     return (
         <div className="mb-3">
             <label htmlFor={props.label.replace(" ", "")} className={`form-label ${labelClass}`}>{props.label}</label>
-            <input max={props.max} type={props.type} required={props.required} className={`form-control ${inputClass}`} id={props.label.replace(" ", "")} value={props.value ?? ''} onChange={(ev) => { 
+            <input 
+                max={props.max} 
+                type={props.type} 
+                required={props.required} 
+                className={`form-control ${inputClass}`}
+                id={props.label.replace(" ", "")} 
+                value={props.value ?? ''} 
+                inputMode={props.type === 'number' ? 'numeric' : 'none'}
+                autoComplete={props.autoComplete}
+                onChange={(ev) => { 
                     props.setValue(ev.target.value);
                 }
-            }></input>
+            } />
         </div>
     )
 }

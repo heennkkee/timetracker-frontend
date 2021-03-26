@@ -59,15 +59,15 @@ const Login = () => {
             <div className="col-12">
                 { !requestMfa ? 
                         <form onSubmit={performLogin}>
-                            <Input label="Email address" type="email" id="email-input" value={email} required={true} setValue={setEmail} />
-                            <Input label="Password" type="password" id="password-input" value={password} required={true} setValue={setPassword} />
+                            <Input label="Email address" type="email" id="email-input" value={email} required={true} setValue={setEmail} autoComplete="username" />
+                            <Input label="Password" type="password" id="password-input" value={password} required={true} setValue={setPassword} autoComplete="current-password" />
                             <div className="mb-3">
                                 <Button type="submit" disabled={loading} btnStyle="success" label="Login" id="login-button" onClick={() => {}} />
                             </div>
                         </form>
                     :
                     <form onSubmit={performLogin}>
-                        <Input label="Multifactor code" type="number" id="mfa-input" value={mfa} required={true} setValue={setMfa} />
+                        <Input label="Multifactor code" type="number" id="mfa-input" value={mfa} required={true} setValue={setMfa} autoComplete="one-time-code" />
                         <div className="mb-3">
                             <Button type="submit" disabled={loading} btnStyle="success" label="Login" id="login-button" onClick={() => {}} />
                         </div>
