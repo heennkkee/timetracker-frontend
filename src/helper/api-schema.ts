@@ -222,6 +222,8 @@ export interface operations {
       query: {
         /** Optional parameter to limit number of returns */
         limit?: number;
+        /** Optional parameter to limit since what datetime clockings should be included */
+        since?: string;
       };
     };
     responses: {

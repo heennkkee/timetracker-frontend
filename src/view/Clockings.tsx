@@ -9,17 +9,16 @@ import ManualClockingAddition from '../component/ManualClockingAddition';
 
 
 type Direction = 'in' | 'out';
+type Clocking = { id: number, direction: Direction, userid: number, datetime: string };
 
 const Clockings = () => {
-    const [clockings, setClockings] = useState<null | { id: number, direction: Direction, userid: number, datetime: string }[]>(null);
-    //const [error, setError] = useState< Error | null >(null);
-    const [loadingData, setLoadingData] = useState<boolean>(true);
+    const [ lastDbClocking, setLastDbClocking ] = useState<null | Clocking>(null);
+    const [ todaysClockings, setTodaysClockings ] = useState<null | Clocking[]>(null);
+
+    const [ loadingLastClocking, setLoadingClocking ] = useState<boolean>(true);
+    const [ loadingTodaysClockings, setLoadingTodaysClockings ] = useState<boolean>(true);
 
     const [ sendingApiData, setSendingApiData ] = useState(false);
-
-    const [ lastClocking, setLastClocking ] = useState<null | { direction: Direction, datetime: Date }>(null);
-    
-    const [ oldPostsLimit /*, setOldPostsLimit */ ] = useState(15);
 
     const [ prev5Minute, setPrev5Minute ] = useState(() => {
         return new Date(new Date().setMinutes(new Date().getMinutes() - (new Date().getMinutes() % 5), 0, 0));
@@ -28,7 +27,6 @@ const Clockings = () => {
         return new Date(new Date().setMinutes(new Date().getMinutes() + 5 - (new Date().getMinutes() % 5), 0, 0));
     });
 
-    
     // Interval was leaking, do something proper sometime..
     const update5Minutes = () => {
         console.log("updating clock times");
@@ -39,38 +37,70 @@ const Clockings = () => {
 
     const AuthCtxt = useContext(AuthContext);
 
-    useEffect(() => {
-        if (clockings !== null && clockings.length > 0) {
-            setLastClocking({ direction: clockings[0].direction, datetime: new Date(clockings[0].datetime) });
-        }
-    }, [ clockings ]);
-
 	useEffect(() => {
-		const fetchAsync = async () => {
+		const fetchLastClockingAsync = async () => {
             if (AuthCtxt.currentUser !== undefined) {
-                const resp = await Api.loadClockings({ userid: AuthCtxt.currentUser }, { limit: oldPostsLimit });
-                console.log(resp);
+                const resp = await Api.loadClockings({ userid: AuthCtxt.currentUser }, { limit: 1 });
                 if (resp.status === 200) {
-                    setClockings(resp.data);
+                    if (resp.data.length > 0) {
+                        setLastDbClocking(resp.data[0]);
+                    }
                 } else {
                     //setError({ message: resp.detail, title: resp.title });
                 }
 
-                setLoadingData(false);
+                setLoadingClocking(false);
             }
 		}
-        fetchAsync();
-	}, [ oldPostsLimit, AuthCtxt.currentUser ]);
+
+		const fetchTodaysClockingsAsync = async () => {
+            if (AuthCtxt.currentUser !== undefined) {
+                const resp = await Api.loadClockings({ userid: AuthCtxt.currentUser }, { since: new Date(new Date().toLocaleDateString()).toJSON() });
+                if (resp.status === 200) {
+                    if (resp.data.length > 0) {
+                        setTodaysClockings(resp.data);
+                    }
+                } else {
+                    //setError({ message: resp.detail, title: resp.title });
+                }
+
+                setLoadingTodaysClockings(false);
+            }
+		}
+        
+        fetchLastClockingAsync();
+        fetchTodaysClockingsAsync();
+	}, [ AuthCtxt.currentUser ]);
 
     const addClocking = async (dir: 'in' | 'out', datetime: Date = new Date()) => {
         if (AuthCtxt.currentUser !== undefined) {
             setSendingApiData(true);
             const resp = await Api.addClocking({ userid: AuthCtxt.currentUser }, { direction: dir, datetime: datetime.toJSON()});
             if (resp.status === 201) {
-                if (clockings !== null) {
-                    setClockings([ resp.data, ...clockings.splice(0, oldPostsLimit - 1) ]);
+                if (lastDbClocking === null) {
+                    setLastDbClocking(resp.data);
                 } else {
-                    setClockings([resp.data]);
+                    if (new Date(resp.data.datetime) > new Date(lastDbClocking.datetime)) {
+                        setLastDbClocking(resp.data);
+                    }
+                }
+                const today = new Date();
+                const newValDt = new Date(resp.data.datetime);
+
+                if (newValDt.getFullYear() === today.getFullYear() && newValDt.getMonth() === today.getMonth() && newValDt.getDate() === today.getDate()) {
+                    if (todaysClockings === null || todaysClockings.length === 0) {
+                        setTodaysClockings([ resp.data ]);
+                    } else {
+                        let insertAtIx = todaysClockings.findIndex(clocking => {
+                            return new Date(clocking.datetime) > new Date();
+                        });
+
+                        setTodaysClockings([
+                            ...todaysClockings.slice(0, insertAtIx + 1),
+                            resp.data,
+                            ...todaysClockings.slice(insertAtIx + 1)
+                        ]);
+                    }
                 }
             }
             update5Minutes();
@@ -83,11 +113,26 @@ const Clockings = () => {
         if (AuthCtxt.currentUser !== undefined) {
             setSendingApiData(true);
             const resp = await Api.removeClocking({ userid: AuthCtxt.currentUser, clockingid: id });
+
+            // This can be cleaned up....
             if (resp.status === 200) {
-                if (clockings !== null) {
-                    setClockings([ ...clockings.filter(clocking => clocking.id !== id) ]);
-                } else {
-                    setClockings([]);
+                let setLastDbClock = false;
+                if ((lastDbClocking?.id ?? null) === id) {
+                    if (todaysClockings === null || todaysClockings.length === 0) {
+                        window.location.reload();
+                    } else {
+                        setLastDbClock = true;
+                    }
+                }
+
+                if (todaysClockings !== null) {
+                    let clockings = [...todaysClockings];
+                    clockings = clockings.filter(clocking => clocking.id !== id);
+                    setTodaysClockings(clockings);
+
+                    if (setLastDbClock) {
+                        setLastDbClocking(clockings[0]);
+                    }
                 }
             }
             update5Minutes();
@@ -96,65 +141,60 @@ const Clockings = () => {
         }
     }
     
-    const btnStyle = (lastClocking?.direction ?? 'out') === 'in' ? 'danger' : 'success';
-    const btnDir = (lastClocking?.direction ?? 'out') === 'in' ? 'out' : 'in';
+    const btnStyle = (lastDbClocking?.direction ?? 'out') === 'in' ? 'danger' : 'success';
+    const btnDir = (lastDbClocking?.direction ?? 'out') === 'in' ? 'out' : 'in';
 
     return (
         <div className="row">
             <div className="col-12">
                 <h2>Clockings</h2>
-                {
-                    (loadingData ? 
-                        <Loadingspinner />
-                    :
-                        <div className="row">
-                            <div className="col-12">
-                                {lastClocking !== null ? 
-                                        <>
-                                            <p key="status" className="lead">You are currently clocked <b>{lastClocking.direction ?? 'out'}</b>.</p>
-                                            <p key="last-clock">You clocked {lastClocking.direction ?? 'out'} at <i>{lastClocking.datetime.toLocaleString()}</i>.</p>
-                                        </>
-                                    :
-                                        null
-                                }
-                            </div>
-                            <div className="col-12 mb-3">
-                                <h4>Clock {btnDir}</h4>
-                                <Button disabled={sendingApiData} 
-                                    label={`@ ${prev5Minute.toLocaleTimeString().split(':').slice(0, 2).join(':')}`} id='toggle-clocking' 
-                                    btnStyle={btnStyle} 
-                                    onClick={() => { addClocking(btnDir, prev5Minute) }} 
-                                />
-                                <Button disabled={sendingApiData} 
-                                    label={`Now`} id='toggle-clocking' 
-                                    btnStyle={btnStyle} 
-                                    onClick={() => { addClocking(btnDir) }} 
-                                />
-                                <Button disabled={sendingApiData} 
-                                    label={`@ ${next5Minute.toLocaleTimeString().split(':').slice(0, 2).join(':')}`} id='toggle-clocking' 
-                                    btnStyle={btnStyle} 
-                                    onClick={() => { addClocking(btnDir, next5Minute) }} 
-                                />
-                            </div>
-
-                            <ManualClockingAddition addClocking={addClocking} disableButtons={sendingApiData} />
-                            
-                            <div className="col-12 mt-4">
-                                <h4>Some clockings</h4>
-                                <div className="row">
-                                    {clockings?.map((val) => { 
-                                        return (
-                                            <div key={val["id"]} className="d-flex justify-content-between col-12 mb-4 align-items-center">
-                                                <span><i>{new Date(val["datetime"]).toLocaleString()}</i> - <b>{val["direction"]}</b></span>
-                                                <Button id={`remove-clocking-${val['id']}`} disabled={sendingApiData} label='X' btnStyle='danger' onClick={() => { removeClocking(val["id"])}} />
-                                            </div> 
-                                        );
-                                    })}
-                                </div>
-                            </div>
+                <div className="row">
+                    <div className="col-12">
+                        {lastDbClocking === null ? <p>You have never clocked anything.</p> : 
+                            <>
+                                <p key="status" className="lead">You are currently clocked <b>{lastDbClocking?.direction ?? '-'}</b>.</p>
+                                <p key="last-clock">You clocked {lastDbClocking?.direction ?? '-'} at <i>{lastDbClocking === null ? '' : new Date(lastDbClocking.datetime).toLocaleString()}</i>.</p>
+                            </>
+                        }
+                    </div>
+                    {loadingLastClocking ? <Loadingspinner /> : 
+                        <div className="col-12 mb-3">
+                            <h4>Clock {btnDir}</h4>
+                            <Button disabled={sendingApiData} 
+                                label={`@ ${prev5Minute.toLocaleTimeString().split(':').slice(0, 2).join(':')}`} id='toggle-clocking' 
+                                btnStyle={btnStyle} 
+                                onClick={() => { addClocking(btnDir, prev5Minute) }} 
+                            />
+                            <Button disabled={sendingApiData} 
+                                label={`Now`} id='toggle-clocking' 
+                                btnStyle={btnStyle} 
+                                onClick={() => { addClocking(btnDir) }} 
+                            />
+                            <Button disabled={sendingApiData} 
+                                label={`@ ${next5Minute.toLocaleTimeString().split(':').slice(0, 2).join(':')}`} id='toggle-clocking' 
+                                btnStyle={btnStyle} 
+                                onClick={() => { addClocking(btnDir, next5Minute) }} 
+                            />
                         </div>
-                    )
-                }
+                    }
+                </div>
+                <div className="col-12 mt-4">
+                    <h4>Todays clockings</h4>
+                    <div className="row">
+                        { loadingTodaysClockings ? <Loadingspinner /> :
+                            ((todaysClockings?.length ?? 0) === 0) ? <p>No clockings for today yet.</p> : todaysClockings?.map((val) => { 
+                                return (
+                                    <div key={val["id"]} className="d-flex justify-content-between col-12 mb-4 align-items-center">
+                                        <span><i>{new Date(val["datetime"]).toLocaleString()}</i> - <b>{val["direction"]}</b></span>
+                                        <Button id={`remove-clocking-${val['id']}`} disabled={sendingApiData} label='X' btnStyle='danger' onClick={() => { removeClocking(val["id"])}} />
+                                    </div> 
+                                );
+                            })
+                        }
+                    </div>
+                </div>
+
+                <ManualClockingAddition addClocking={addClocking} disableButtons={sendingApiData} />
             </div>
         </div>
     );

@@ -105,7 +105,10 @@ class Api {
     }
 
     static loadClockings = async(path: CLOCKINGS_GET_PATH, qs: CLOCKINGS_GET_QS) => {
-        let url = `${APIURL}/users/${path.userid}/clockings?limit=${qs.limit}`;
+        let limit = (qs.limit !== undefined) ? `limit=${qs.limit}` : '';
+        let since = (qs.since !== undefined) ? `since=${qs.since}` : '';
+
+        let url = `${APIURL}/users/${path.userid}/clockings?${[limit, since].join('&')}`;
         const resp = await fetch(url, { 
             headers: { 'Content-Type': 'application/json' }, 
             credentials: 'include', 
