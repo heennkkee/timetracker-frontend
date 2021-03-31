@@ -1,4 +1,4 @@
-import React, { useState, Suspense, useEffect } from 'react';
+import React, { useState, Suspense, useEffect, useCallback } from 'react';
 
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 
@@ -43,14 +43,21 @@ function App() {
 		return parseInt(id);
 	});
 
+	const authLogout = useCallback(async () => {
+		await API.logout({ "session": session }); 
+		setSession(""); 
+		Cookies.delete("userid");
+		setCurrentUser(undefined); 
+	}, [ session ] );
+
 
 	useEffect(() => {
 		const asyncCheckAuth = async () => {
 			console.log("Checking authentication in background");
 			let resp = await API.check();
 			if (resp.status !== 200) {
-				Cookies.delete("session");
-				setSession('');
+				await authLogout();
+				window.location.reload();
 			}
 		}
 
@@ -59,7 +66,7 @@ function App() {
 			asyncCheckAuth();
 		}
 		
-	}, [ session ]);
+	}, [ session, authLogout ]);
 
 
 	const toggleMode = () => {
@@ -75,12 +82,7 @@ function App() {
 		"session": session, 
 		"setSession": (newSess: string) => { setSession(newSess); }, 
 		"authenticated": session !== '', 
-		"logout": async () => { 
-				await API.logout({ "session": session }); 
-				setSession(""); 
-				Cookies.delete("userid");
-				setCurrentUser(undefined); 
-			},
+		"logout": authLogout,
 		"currentUser": currentUser,
 		"setCurrentUser": (newUser: number | undefined) => setCurrentUser(newUser)
 	}
