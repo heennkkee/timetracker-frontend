@@ -367,7 +367,6 @@ export interface operations {
           };
         };
       };
-      401: components["responses"]["NotAuthorized"];
     };
     requestBody: {
       content: {

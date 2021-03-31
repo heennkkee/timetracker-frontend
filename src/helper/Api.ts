@@ -34,7 +34,6 @@ type LOGIN_401 = paths["/auth/login"]["post"]["responses"]["401"]["content"]["ap
 
 type LOGOUT_BODY = paths["/auth/logout"]["post"]["requestBody"]["content"]["application/json"];
 type LOGOUT_200 = paths["/auth/logout"]["post"]["responses"]["200"]["content"]["application/json"];
-type LOGOUT_401 = paths["/auth/logout"]["post"]["responses"]["401"]["content"]["application/json"];
 
 type UPDATE_PASSWORD_BODY = paths["/users/{userid}/password"]["put"]["requestBody"]["content"]["application/json"];
 type UPDATE_PASSWORD_PATH = paths["/users/{userid}/password"]["put"]["parameters"]["path"];
@@ -216,7 +215,7 @@ class Api {
             credentials: 'include', 
             method: 'POST', 
             body: JSON.stringify(session)
-        }).then(resp => resp.json()).then((json: LOGOUT_200 | LOGOUT_401) => {
+        }).then(resp => resp.json()).then((json: LOGOUT_200) => {
 			return json;
 		}).catch((err) => {
             return { status: 500, detail: `Generic error: ${err.message}.`, title: 'Error' } as GENERIC_ERROR;
