@@ -149,15 +149,16 @@ const Clockings = () => {
             <div className="col-12">
                 <h2>Clockings</h2>
                 <div className="row">
-                    <div className="col-12">
-                        {lastDbClocking === null ? <p>You have never clocked anything.</p> : 
-                            <>
-                                <p key="status" className="lead">You are currently clocked <b>{lastDbClocking?.direction ?? '-'}</b>.</p>
-                                <p key="last-clock">You clocked {lastDbClocking?.direction ?? '-'} at <i>{lastDbClocking === null ? '' : new Date(lastDbClocking.datetime).toLocaleString()}</i>.</p>
-                            </>
-                        }
-                    </div>
                     {loadingLastClocking ? <Loadingspinner /> : 
+                    <>
+                        <div className="col-12">
+                            {lastDbClocking === null ? <p>You have never clocked anything.</p> : 
+                                <>
+                                    <p key="status" className="lead">You are currently clocked <b>{lastDbClocking?.direction ?? '-'}</b>.</p>
+                                    <p key="last-clock">You clocked {lastDbClocking?.direction ?? '-'} at <i>{lastDbClocking === null ? '' : new Date(lastDbClocking.datetime).toLocaleString()}</i>.</p>
+                                </>
+                            }
+                        </div>
                         <div className="col-12 mb-3">
                             <h4>Clock {btnDir}</h4>
                             <Button disabled={sendingApiData} 
@@ -176,6 +177,7 @@ const Clockings = () => {
                                 onClick={() => { addClocking(btnDir, next5Minute) }} 
                             />
                         </div>
+                    </>
                     }
                 </div>
                 <div className="col-12 mt-4">
