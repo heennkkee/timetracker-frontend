@@ -65,3 +65,26 @@
     cursor: not-allowed !important;
     pointer-events: initial !important;
 }
+
+.background-lightgray {
+    background-color: #e9ecef;
+}
+
+.background-darkgray {
+    background-color: #343a40;
+}
+
+.timeline-dark-success {
+    background-color: hsl(152deg 69% 17%);
+}
+
+.timeline-success {
+    background-color: hsl(152deg 69% 31%);
+}
+
+.timeline-danger {
+    background-color: hsl(354deg 70% 54%);
+}
+.timeline-dark-danger {
+    background-color: hsl(354deg 70% 21%);
+}

@@ -224,6 +224,8 @@ export interface operations {
         limit?: number;
         /** Optional parameter to limit since what datetime clockings should be included */
         since?: string;
+        /** Optional parameter to limit to what datetime clockings should be included */
+        to?: string;
       };
     };
     responses: {

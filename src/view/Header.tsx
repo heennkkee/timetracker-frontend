@@ -34,6 +34,9 @@ const Header = () => {
                             <li className="nav-item">
                                 <Link to="/users" className={`nav-link ${location[1] === 'users' ? 'active' : ''}`}>Users</Link>
                             </li>
+                            <li className="nav-item">
+                                <Link to="/daydetails" className={`nav-link ${location[1] === 'daydetails' ? 'active' : ''}`}>Details</Link>
+                            </li>
                         </ul>
                         <div className="form-inline">
                             {
