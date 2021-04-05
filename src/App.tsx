@@ -17,6 +17,7 @@ const UserList = React.lazy(() => import("./view/UserList"));
 const FourOhFour = React.lazy(() => import("./view/FourOhFour"));
 const Login = React.lazy(() => import("./view/Login"));
 const DayDetails = React.lazy(() => import('./view/DayDetails'));
+const MonthDetails = React.lazy(() => import('./view/MonthDetails'));
 
 function App() {
 
@@ -117,6 +118,11 @@ function App() {
 											<Route exact path="/dayDetails">
 												<Suspense fallback={''}>
 													<DayDetails />
+												</Suspense>
+											</Route>
+											<Route exact path="/month">
+												<Suspense fallback={''}>
+													<MonthDetails />
 												</Suspense>
 											</Route>
 											<Route exact path="/">

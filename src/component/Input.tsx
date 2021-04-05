@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { Theme, ThemeContext } from "../context/ThemeContext";
 
-type SupportedInputTypes = 'email' | 'password' | 'string' | 'number' | 'date' | 'time';
+type SupportedInputTypes = 'email' | 'password' | 'string' | 'number' | 'date' | 'time' | 'month';
 
 type InputProps = {
     label: string,

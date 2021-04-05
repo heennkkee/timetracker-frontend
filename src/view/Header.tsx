@@ -37,16 +37,21 @@ const Header = () => {
                             <li className="nav-item">
                                 <Link to="/daydetails" className={`nav-link ${location[1] === 'daydetails' ? 'active' : ''}`}>Details</Link>
                             </li>
-                        </ul>
-                        <div className="form-inline">
+                            <li className="nav-item">
+                                <Link to="/month" className={`nav-link ${location[1] === 'month' ? 'active' : ''}`}>Month</Link>
+                            </li>
+                            <li>
+                                <a className="nav-link" href="#" onClick={() => { ThemeCtxt.toggle() }}>{ ThemeCtxt.mode === Theme.Light ? 'Dark' : 'Light'} mode</a>
+                            </li>
                             {
                                 AuthCtxt.authenticated ? 
-                                    <Button spaceToLeft={true} id='logout-button' label='Logout' onClick={async () => { await AuthCtxt.logout(); }} />
+                                    <li>
+                                        <a className="nav-link" href="#" onClick={async () => { await AuthCtxt.logout() }}>Logout</a>
+                                    </li>
                                 :
                                     null
                             }
-                            <Button spaceToLeft={true} id='toggleTheme-button' label={ ThemeCtxt.mode === Theme.Light ? 'Dark' : 'Light'} onClick={() => { ThemeCtxt.toggle(); }} />
-                        </div>
+                        </ul>
                     </div>
                 </nav>
                 {
