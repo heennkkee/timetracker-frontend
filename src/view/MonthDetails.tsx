@@ -81,7 +81,7 @@ const MonthDetails = () => {
                 if (day >= to || day < 0) {
 
                 } else {
-                    content.push(<p key={0}>{day + 1}</p>)
+                    content.push(<i key={0}><small>{day + 1}</small></i>)
 
                     let ourDay = monthStr + '-' + (String(day + 1).length === 1 ? '0' : '') + String(day + 1);
                     if (report !== null) {
@@ -92,7 +92,7 @@ const MonthDetails = () => {
                     }
                 }
 
-                days.push(<div className="col calendar-box border-end">{content.map(el => el)}</div>)
+                days.push(<div key={day} className="col calendar-box border-end">{content.map(el => el)}</div>)
             }
 
             let className = 'col-12 border-top border-start';
@@ -101,7 +101,7 @@ const MonthDetails = () => {
                 className += ' border-bottom';
             }
 
-            ret.push(<div className={className}><div className="row">{days}</div></div>);
+            ret.push(<div key={x} className={className}><div className="row">{days}</div></div>);
         }
 
         return ret;
