@@ -88,3 +88,7 @@
 .timeline-dark-danger {
     background-color: hsl(354deg 70% 21%);
 }
+
+.calendar-box {
+    height: 100px;
+}

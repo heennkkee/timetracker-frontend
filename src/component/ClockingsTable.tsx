@@ -3,18 +3,14 @@ import { Theme, ThemeContext } from "../context/ThemeContext";
 import Button from './Button';
 import { Clocking } from '../helper/types';
 
-import Api from '../helper/Api';
-import { AuthContext } from '../context/AuthContext';
-
 type InputProps = {
-    clockings: Clocking[]
+    clockings: Clocking[],
+    removeClocking?: Function,
+    disableAction?: boolean
 }
 
 const Timeline = (props: InputProps) => {
     const ThemeCtxt = useContext(ThemeContext);
-    const AuthCtxt = useContext(AuthContext);
-
-    const [ sendingApiData, setSendingApiData ] = useState(false);
 
     const [ clockings, setClockings ] = useState<Clocking[]>([]);
 
@@ -24,26 +20,9 @@ const Timeline = (props: InputProps) => {
     }, [props.clockings]);
 
 
-    const removeClocking = async (id: number) => {
-        if (AuthCtxt.currentUser !== undefined) {
-            setSendingApiData(true);
-            const resp = await Api.removeClocking({ userid: AuthCtxt.currentUser, clockingid: id });
-
-            // This can be cleaned up....
-            if (resp.status === 200) {
-                if (clockings !== null) {
-                    let newClockings = [ ...clockings ];
-                    newClockings = newClockings.filter(clocking => clocking.id !== id);
-                    setClockings(newClockings);
-                }
-            }
-            
-            setSendingApiData(false);
-        }
-    }
-
     const tableClass = ( ThemeCtxt.mode === Theme.Dark ) ? 'table-dark text-white-50' : '';
 
+    let callback = props.removeClocking;
     return (
         <table className={`table ${tableClass}`}>
             <thead>
@@ -60,7 +39,7 @@ const Timeline = (props: InputProps) => {
                                 <td>{new Date(val["datetime"]).toLocaleString()}</td>
                                 <td>{val["direction"]}</td>
                                 <td>
-                                    <Button id={`remove-clocking-${val['id']}`} disabled={sendingApiData} label='X' btnStyle='danger' onClick={() => { removeClocking(val["id"])}} />
+                                    {callback !== undefined ? <Button id={`remove-clocking-${val['id']}`} disabled={props?.disableAction ?? false} label='X' btnStyle='danger' onClick={() => { if (callback !== undefined) { callback(val["id"]); } }} /> : null}
                                 </td>
                             </tr>
                         );

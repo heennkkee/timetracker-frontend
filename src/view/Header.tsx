@@ -5,8 +5,6 @@ import { AuthContext } from '../context/AuthContext';
 
 import { ThemeContext, Theme } from '../context/ThemeContext';
 
-import Button from '../component/Button';
-
 
 const Header = () => {
     const ThemeCtxt = useContext(ThemeContext);
@@ -41,12 +39,12 @@ const Header = () => {
                                 <Link to="/month" className={`nav-link ${location[1] === 'month' ? 'active' : ''}`}>Month</Link>
                             </li>
                             <li>
-                                <a className="nav-link" href="#" onClick={() => { ThemeCtxt.toggle() }}>{ ThemeCtxt.mode === Theme.Light ? 'Dark' : 'Light'} mode</a>
+                                <span className="nav-link" onClick={() => { ThemeCtxt.toggle() }}>{ ThemeCtxt.mode === Theme.Light ? 'Dark' : 'Light'} mode</span>
                             </li>
                             {
                                 AuthCtxt.authenticated ? 
                                     <li>
-                                        <a className="nav-link" href="#" onClick={async () => { await AuthCtxt.logout() }}>Logout</a>
+                                        <span className="nav-link" onClick={async () => { await AuthCtxt.logout() }}>Logout</span>
                                     </li>
                                 :
                                     null

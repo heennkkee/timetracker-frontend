@@ -16,6 +16,8 @@ const DayDetails = () => {
 
     const [ selectedDate, setSelectedDate ] = useState<string>(new Date().toISOString().split('T')[0]);
 
+    const [ sendingApiData, setSendingApiData ] = useState(false);
+    
     const AuthCtxt = useContext(AuthContext);
 
 	useEffect(() => {
@@ -35,6 +37,24 @@ const DayDetails = () => {
         
         fetchTodaysClockingsAsync();
 	}, [ AuthCtxt.currentUser, selectedDate ]);
+
+    const removeClocking = async (id: number) => {
+        if (AuthCtxt.currentUser !== undefined) {
+            setSendingApiData(true);
+            const resp = await Api.removeClocking({ userid: AuthCtxt.currentUser, clockingid: id });
+
+            // This can be cleaned up....
+            if (resp.status === 200) {
+                if (clockings !== null) {
+                    let newClockings = [ ...clockings ];
+                    newClockings = newClockings.filter(clocking => clocking.id !== id);
+                    setClockings(newClockings);
+                }
+            }
+            
+            setSendingApiData(false);
+        }
+    }
             
     return (
         <div className="row">
@@ -48,7 +68,7 @@ const DayDetails = () => {
             </div>
             <div className="col-12 mt-4">
                 <h4>Table</h4>
-                { loadingClockings ? <Loadingspinner /> : (clockings !== null ? <ClockingsTable clockings={clockings} /> : null )}
+                { loadingClockings ? <Loadingspinner /> : (clockings !== null ? <ClockingsTable disableAction={sendingApiData} clockings={clockings} removeClocking={removeClocking} /> : null )}
             </div>
         </div>
     );
