@@ -64,6 +64,10 @@ type CLOCKINGS_DELETE_200 = paths["/users/{userid}/clockings/{clockingid}"]["del
 type CLOCKINGS_DELETE_404 = paths["/users/{userid}/clockings/{clockingid}"]["delete"]["responses"]["404"]["content"]["application/json"];
 type CLOCKINGS_DELETE_500 = paths["/users/{userid}/clockings/{clockingid}"]["delete"]["responses"]["500"]["content"]["application/json"];
 
+type REPORT_PATH = paths["/users/{userid}/report"]["get"]["parameters"]["path"];
+type REPORT_QUERY = paths["/users/{userid}/report"]["get"]["parameters"]["query"];
+type REPORT_200 = paths["/users/{userid}/report"]["get"]["responses"]["200"]["content"]["application/json"];
+
 type GENERIC_ERROR = {
     status: 500,
     detail: string,
@@ -73,6 +77,19 @@ type GENERIC_ERROR = {
 
 
 class Api {
+
+    static getWorktimeReport = async(path: REPORT_PATH, query: REPORT_QUERY) => {
+        let url = `${APIURL}/users/${path.userid}/report?since=${query.since}&to=${query.to}`;
+        const resp = await fetch(url, { 
+            headers: { 'Content-Type': 'application/json' }, 
+            credentials: 'include'
+        }).then(resp => resp.json()).then((json: REPORT_200 ) => {
+            return json;
+        }).catch((err) => {
+            return { status: 500, detail: `Generic error: ${err.message}.`, title: 'Error' } as GENERIC_ERROR;
+        });
+        return resp;
+    }
 
     static removeClocking = async(path: CLOCKINGS_DELETE_PATH) => {
         let url = `${APIURL}/users/${path.userid}/clockings/${path.clockingid}`;

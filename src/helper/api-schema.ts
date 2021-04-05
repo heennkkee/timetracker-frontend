@@ -15,8 +15,12 @@ export interface paths {
     delete: operations["users.remove"];
   };
   "/users/{userid}/clockings": {
-    get: operations["clockings.list_users_all_clockings"];
+    get: operations["clockings.list_user_clockings"];
     post: operations["clockings.add"];
+  };
+  "/users/{userid}/report": {
+    /** Returns a summary of worktime grouped per day */
+    get: operations["clockings.summarizeTimePerDay"];
   };
   "/users/{userid}/clockings/{clockingid}": {
     /** Removes a clocking */
@@ -60,6 +64,12 @@ export interface components {
       status: 400 | 401 | 404;
       title: string;
       type?: string;
+    };
+    WorktimeSummary: {
+      worktime: number;
+      ob1: number;
+      ob2: number;
+      ob3: number;
     };
     Clocking: {
       id: number;
@@ -213,7 +223,7 @@ export interface operations {
       500: components["responses"]["ServerError"];
     };
   };
-  "clockings.list_users_all_clockings": {
+  "clockings.list_user_clockings": {
     parameters: {
       path: {
         /** Userid */
@@ -264,6 +274,32 @@ export interface operations {
     requestBody: {
       content: {
         "application/json": components["schemas"]["ClockingInput"];
+      };
+    };
+  };
+  /** Returns a summary of worktime grouped per day */
+  "clockings.summarizeTimePerDay": {
+    parameters: {
+      path: {
+        /** Userid */
+        userid: components["parameters"]["UserId"];
+      };
+      query: {
+        /** Required parameter to limit since what datetime clockings should be included */
+        since: string;
+        /** Required parameter to limit to what datetime clockings should be included */
+        to: string;
+      };
+    };
+    responses: {
+      /** Summary */
+      200: {
+        content: {
+          "application/json": {
+            status: 200;
+            data: { [key: string]: components["schemas"]["WorktimeSummary"] };
+          };
+        };
       };
     };
   };

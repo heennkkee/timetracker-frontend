@@ -3,25 +3,29 @@ import { AuthContext } from "../context/AuthContext";
 import Api from "../helper/Api";
 
 import Loadingspinner from '../component/Loadingspinner';
-import ClockingsTable from "../component/ClockingsTable";
 
-import { Clocking } from '../helper/types';
 import Input from "../component/Input";
 
+type WorktimeReport = {
+    worktime: number,
+    ob1: number,
+    ob2: number,
+    ob3: number
+}
 
 const MonthDetails = () => {
-    const [ clockings, setClockings ] = useState<null | Clocking[]>(null);
-    const [ loadingClockings, setLoadingClockings ] = useState<boolean>(true);
+    const [ loadingReport, setLoadingReport ] = useState<boolean>(true);
 
     const [ selectedMonth, setSelectedMonth ] = useState<string>(() => {
-
         return new Date().toISOString().split('T')[0];
     });
+
+    const [ report, setReport ] = useState<null | { [key: string]: WorktimeReport }>(null);
 
     const AuthCtxt = useContext(AuthContext);
 
 	useEffect(() => {
-		const fetchTodaysClockingsAsync = async () => {
+		const fetchMonthReport = async () => {
             if (AuthCtxt.currentUser !== undefined) {
                 let fromDate = new Date(selectedMonth);
                 fromDate.setUTCDate(1);
@@ -30,20 +34,22 @@ const MonthDetails = () => {
                 let toDate = new Date(fromDate.getTime());
                 toDate.setMonth(toDate.getMonth() + 1);
 
-                setLoadingClockings(true);
-                const resp = await Api.loadClockings({ userid: AuthCtxt.currentUser }, { since: fromDate.toJSON(), to: toDate.toJSON() });
+                setLoadingReport(true);
+                const resp = await Api.getWorktimeReport({ userid: AuthCtxt.currentUser }, { since: fromDate.toJSON(), to: toDate.toJSON() });
+ 
                 if (resp.status === 200) {
-                    console.log(resp.data);
-                    setClockings(resp.data);
+                    setReport(resp.data);
+                    
                 } else {
                     //setError({ message: resp.detail, title: resp.title });
                 }
 
-                setLoadingClockings(false);
+                setLoadingReport(false);
             }
 		}
+
         
-        fetchTodaysClockingsAsync();
+        fetchMonthReport();
 	}, [ AuthCtxt.currentUser, selectedMonth ]);
     
     const renderCalendar = () => {
@@ -51,6 +57,7 @@ const MonthDetails = () => {
         
         let firstWeekday = new Date(new Date(selectedMonth).setDate(1)).getDay();
         
+        let monthStr = new Date(selectedMonth).toISOString().split('T')[0].split('-').splice(0, 2).join('-');
         let offsetDays;
         switch (firstWeekday) {
             case 0:
@@ -70,15 +77,22 @@ const MonthDetails = () => {
             for (var y = 0; y < 7; y++) {
                 let day = (x * 7) + y - offsetDays;
                 
-                let text;
+                let content: JSX.Element[] = [];
                 if (day >= to || day < 0) {
-                    text = '-';
+
                 } else {
-                    text = day + 1;
-                    console.log(filterDateRange(new Date('2021-03-' + (day + 1)), new Date('2021-03-' + (day + 2))));
+                    content.push(<p key={0}>{day + 1}</p>)
+
+                    let ourDay = monthStr + '-' + (String(day + 1).length === 1 ? '0' : '') + String(day + 1);
+                    if (report !== null) {
+                        let rep = report[ourDay];
+                        if (rep !== undefined) {
+                            content.push(<p key={1}>{Math.round(rep.worktime * 10 / 3600) / 10} h</p>);
+                        }
+                    }
                 }
 
-                days.push(<div className="col calendar-box border-end">{text}</div>)
+                days.push(<div className="col calendar-box border-end">{content.map(el => el)}</div>)
             }
 
             let className = 'col-12 border-top border-start';
@@ -93,14 +107,6 @@ const MonthDetails = () => {
         return ret;
     }
 
-    const filterDateRange = (from: Date, to: Date) => {
-        console.log("filtering from ", from, " to ", to);
-        return clockings?.filter((val) => {
-            let date = new Date(val.datetime);
-            return (date >= from && date < to);
-        })
-    }
-
     return (
         <div className="row">
             <div className="col-12">
@@ -112,14 +118,9 @@ const MonthDetails = () => {
                     }} />
             </div>
             <div className="col-12 mt-4">
-                <h4>Calendar</h4>
                 <div className="row">
-                    {renderCalendar()}
+                    {loadingReport ? <Loadingspinner /> : renderCalendar()}
                 </div>
-            </div>
-            <div className="col-12 mt-4">
-                <h4>Table</h4>
-                { loadingClockings ? <Loadingspinner /> : (clockings !== null ? <ClockingsTable clockings={clockings} /> : null )}
             </div>
         </div>
     );
