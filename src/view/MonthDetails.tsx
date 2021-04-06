@@ -131,7 +131,7 @@ const MonthDetails = () => {
         if (adaptTimesToReporting) {
             let newSeconds = seconds - removeTime; // remove 8 hours for workdays
             let timeVal = Math.round(Math.abs(newSeconds) * 100 / 3600) / 100;
-            const prefix = (newSeconds === 0) ? '' : (newSeconds > 0) ? <span className="text-success fw-bold">+</span> : <span className="text-danger fw-bold">-</span>;
+            const prefix = (timeVal === 0) ? '' : (newSeconds > 0) ? <span className="text-success fw-bold">+</span> : <span className="text-danger fw-bold">-</span>;
             return <>{prefix} {timeVal}h</>;
         } else {
             let hours = Math.floor(seconds / 3600);
