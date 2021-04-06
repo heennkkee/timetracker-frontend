@@ -55,7 +55,7 @@ const Timeline = (props: InputProps) => {
                     width = Math.floor(seconds * 100 / secondsPerDay);
                     color = timelineBase + 'success';
                     let hours = Math.floor(seconds / 3600);
-                    let minutes = Math.floor(seconds - hours * 3600) / 60;
+                    let minutes = Math.round(Math.floor(seconds - hours * 3600) / 60);
                     label = `${hours}h${minutes}m`;
 
                     tempBars.push({
@@ -73,7 +73,7 @@ const Timeline = (props: InputProps) => {
                 let thisSeconds = (new Date(clock["datetime"]).getTime() - midnightSeconds) / 1000;
                 let barDuration = (thisSeconds - prevSeconds);
                 let hours = Math.floor(barDuration / 3600);
-                let minutes = Math.floor(barDuration - hours * 3600) / 60;
+                let minutes = Math.round(Math.floor(barDuration - hours * 3600) / 60);
                 label = `${hours}h${minutes}m`;
                 width = Math.floor((thisSeconds - prevSeconds) * 100 / secondsPerDay);
                 color = timelineBase + (clock['direction'] === 'out' ? 'success' : 'danger');
@@ -90,7 +90,7 @@ const Timeline = (props: InputProps) => {
                         let thisSeconds = (tempDate.setDate(tempDate.getDate() + 1) - midnightSeconds) / 1000;
                         let barDuration = (thisSeconds - prevSeconds);
                         let hours = Math.floor(barDuration / 3600);
-                        let minutes = Math.floor(barDuration - hours * 3600) / 60;
+                        let minutes = Math.round(Math.floor(barDuration - hours * 3600) / 60);
                         tempBars.push({
                             relativeWidth: Math.floor((thisSeconds - prevSeconds) * 100 / secondsPerDay),
                             color: timelineBase + 'success',

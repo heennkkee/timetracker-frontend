@@ -115,12 +115,12 @@ function App() {
 													<UserList />
 												</Suspense>
 											</Route>
-											<Route exact path="/dayDetails">
+											<Route exact path="/dayDetails/:preSelectedDate?">
 												<Suspense fallback={''}>
 													<DayDetails />
 												</Suspense>
 											</Route>
-											<Route exact path="/month">
+											<Route exact path="/month/:preSelectedMonth?">
 												<Suspense fallback={''}>
 													<MonthDetails />
 												</Suspense>
