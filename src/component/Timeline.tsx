@@ -19,7 +19,7 @@ const Timeline = (props: InputProps) => {
     const ThemeCtxt = useContext(ThemeContext);
     
     const fillerBgColor = ( ThemeCtxt.mode === Theme.Dark ) ? 'background-darkgray' : 'background-lightgray';
-    const timelineBase = ( ThemeCtxt.mode === Theme.Dark ) ? 'timeline-dark-' : 'timeline-';
+    
     const textColor = ( ThemeCtxt.mode === Theme.Dark ) ? 'text-white-50' : '';
 
     const [ fromTime, setFromTime ] = useState('00:00');
@@ -27,8 +27,8 @@ const Timeline = (props: InputProps) => {
 
     const [ bars, setBars ] = useState<Bar[]>([]);
 
-    const midnightSeconds = props.baseDate.setHours(0, 0, 0, 0);
     const secondsPerDay = 86400; // 3600s / hour * 24 hours
+    const timelineBase = ( ThemeCtxt.mode === Theme.Dark ) ? 'timeline-dark-' : 'timeline-';
 
     const [ clockings, setClockings ] = useState<Clocking[]>([]);
 
@@ -39,6 +39,10 @@ const Timeline = (props: InputProps) => {
 
 
     useEffect(() => {
+        let tempDate = new Date(props.baseDate);
+
+        const midnightSeconds = tempDate.setHours(0, 0, 0, 0);
+
         let tempBars: Bar[] = [];
         clockings.forEach((clock, ix) => {
             let width;
@@ -83,7 +87,7 @@ const Timeline = (props: InputProps) => {
                 if (ix === clockings.length - 1) {
                     if (clock['direction'] === 'in') {
                         let prevSeconds = (new Date(clock["datetime"]).getTime() - midnightSeconds) / 1000;
-                        let thisSeconds = (props.baseDate.setDate(props.baseDate.getDate() + 1) - midnightSeconds) / 1000;
+                        let thisSeconds = (tempDate.setDate(tempDate.getDate() + 1) - midnightSeconds) / 1000;
                         let barDuration = (thisSeconds - prevSeconds);
                         let hours = Math.floor(barDuration / 3600);
                         let minutes = Math.floor(barDuration - hours * 3600) / 60;
@@ -100,7 +104,7 @@ const Timeline = (props: InputProps) => {
             }
         });
         setBars(tempBars);
-    }, [ clockings, midnightSeconds, props.baseDate, timelineBase ]);
+    }, [ clockings, props.baseDate, timelineBase ]);
 
     let widthSum = 0;
     bars.forEach((bar) => widthSum += bar.relativeWidth);
