@@ -11,6 +11,10 @@ type CalendarProps = {
 }
 
 const Calendar = ({ month, report }: CalendarProps) => {
+    
+    const ThemeCtxt = useContext(ThemeContext);
+    const borderColorClass = ( ThemeCtxt.mode === Theme.Dark ) ? `border-white-50` : ``;
+
     const [ adaptTimesToReporting, setAdaptTimesToReporting ] = useState(false);
     
     const renderCalendar = () => {
@@ -38,13 +42,16 @@ const Calendar = ({ month, report }: CalendarProps) => {
             for (var y = 0; y < 7; y++) {
                 let day = (x * 7) + y - offsetDays;
                 
-                let content: JSX.Element[] = [];
                 if (day >= to || day < 0) {
+
+                    days.push(<div key={day} className={`col calendar-box border-end ${borderColorClass}`}></div>);
 
                 } else {
                     let ourDay = monthStr + '-' + (String(day + 1).length === 1 ? '0' : '') + String(day + 1);
+                    
+                    let content: JSX.Element[] = [];
 
-                    content.push(<i key={0}><small><Link to={`/daydetails/${ourDay}`}>{day + 1}</Link></small></i>)
+                    content.push(<i><small>{day + 1}</small></i>);
 
                     let rep = report[ourDay];
                     if (rep !== undefined) {
@@ -62,12 +69,14 @@ const Calendar = ({ month, report }: CalendarProps) => {
                             </ul>
                         );
                     }
+
+                    days.push(<Link to={`/daydetails/${ourDay}`} key={day} className={`col calendar-box border-end ${borderColorClass}`}>{content.map(el => el)}</Link>)
                 }
 
-                days.push(<div key={day} className="col calendar-box border-end">{content.map(el => el)}</div>)
+                
             }
 
-            let className = 'col-12 border-top border-start';
+            let className = `col-12 border-top border-start ${borderColorClass}`;
 
             if (x === rows - 1) {
                 className += ' border-bottom';
