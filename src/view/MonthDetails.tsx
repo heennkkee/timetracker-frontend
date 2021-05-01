@@ -14,7 +14,7 @@ import { formatSeconds } from "../helper/functions";
 
 const MonthDetails = () => {
     let { preSelectedMonth } = useParams<{ preSelectedMonth?: string }>();
-    const useMonth = preSelectedMonth ?? new Date().toISOString().split('T')[0];
+    const useMonth = preSelectedMonth ?? new Date().toLocaleString('se-sv', { year: 'numeric', month: '2-digit', day: '2-digit'});
     const history = useHistory();
 
     const [ loadingReport, setLoadingReport ] = useState<boolean>(true);
@@ -29,9 +29,7 @@ const MonthDetails = () => {
 	useEffect(() => {
 		const fetchMonthReport = async () => {
             if (AuthCtxt.currentUser !== undefined) {
-                let fromDate = new Date(useMonth);
-                fromDate.setUTCDate(1);
-                fromDate.setUTCHours(0, 0, 0, 0);
+                let fromDate = new Date(`${useMonth} 00:00:00`);
 
                 let toDate = new Date(fromDate.getTime());
                 toDate.setMonth(toDate.getMonth() + 1);

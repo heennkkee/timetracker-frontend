@@ -29,7 +29,7 @@ const DayDetails = () => {
 		const fetchTodaysClockingsAsync = async () => {
             if (AuthCtxt.currentUser !== undefined) {
                 setLoadingClockings(true);
-                const resp = await Api.loadClockings({ userid: AuthCtxt.currentUser }, { since: new Date(useDate).toJSON(), to: new Date(new Date(useDate).setDate(new Date(useDate).getDate() + 1)).toJSON() });
+                const resp = await Api.loadClockings({ userid: AuthCtxt.currentUser }, { since: new Date(`${useDate} 00:00:00`).toJSON(), to: new Date(new Date(`${useDate} 00:00:00`).setDate(new Date(`${useDate} 00:00:00`).getDate() + 1)).toJSON() });
                 if (resp.status === 200) {
                     setClockings(resp.data);
                 } else {
