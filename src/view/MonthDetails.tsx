@@ -14,7 +14,7 @@ import { formatSeconds } from "../helper/functions";
 
 const MonthDetails = () => {
     let { preSelectedMonth } = useParams<{ preSelectedMonth?: string }>();
-    const useMonth = preSelectedMonth ?? new Date().toLocaleString('se-sv', { year: 'numeric', month: '2-digit', day: '2-digit'});
+    const useMonth = preSelectedMonth ?? new Date().toLocaleString('sv-SE', { year: 'numeric', month: '2-digit', day: '2-digit'});
     const history = useHistory();
 
     const [ loadingReport, setLoadingReport ] = useState<boolean>(true);

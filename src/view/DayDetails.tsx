@@ -9,6 +9,7 @@ import ClockingsTable from '../component/ClockingsTable';
 import { Clocking } from '../helper/types';
 import Input from "../component/Input";
 import { useParams, useHistory } from "react-router-dom";
+import Button from "../component/Button";
 
 
 const DayDetails = () => {
@@ -68,6 +69,16 @@ const DayDetails = () => {
                 <Input label="Day" type="date" id="selected-date-input" value={useDate} setValue={(val: string) => {
                     history.push(`/daydetails/${val}`);
                 }} />
+            </div>
+            <div className="col-12 d-flex justify-content-between">
+                <Button label="Previous" btnStyle="info" key="btn-previous" id="btn-previous" onClick={() => {
+                    let newDate = new Date(new Date(useDate).setDate(new Date(useDate).getDate() - 1));
+                    history.push(`/daydetails/${newDate.toLocaleString('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit'})}`);
+                }}  />
+                <Button label="Next" btnStyle="info" key="btn-next" id="btn-next" onClick={() => {
+                    let newDate = new Date(new Date(useDate).setDate(new Date(useDate).getDate() + 1));
+                    history.push(`/daydetails/${newDate.toLocaleString('sv-SE', {year: 'numeric', month: '2-digit', day: '2-digit'})}`);
+                }} spaceToLeft={true} />
             </div>
             <div className="col-12 mt-4">
                 <h4>Timeline</h4>
