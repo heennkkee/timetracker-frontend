@@ -297,7 +297,12 @@ export interface operations {
         content: {
           "application/json": {
             status: 200;
-            data: { [key: string]: components["schemas"]["WorktimeSummary"] };
+            data: {
+              summary: components["schemas"]["WorktimeSummary"];
+              details: {
+                [key: string]: components["schemas"]["WorktimeSummary"];
+              };
+            };
           };
         };
       };
