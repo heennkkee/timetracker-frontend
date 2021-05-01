@@ -99,6 +99,10 @@
     text-decoration: underline !important;
 }
 
+.calendar-box.disabled {
+    background-color: rgba(0, 0, 0, 0.15);
+}
+
 .border-white-50 {
     border-color: rgba(255, 255, 255, 0.5) !important;
 }

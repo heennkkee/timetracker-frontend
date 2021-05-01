@@ -22,8 +22,6 @@ const MonthDetails = () => {
     const [ reportDetails, setReportDetails ] = useState<WorktimeReport>({});
     const [ reportSummary, setReportSummary ] = useState<null | Worktime >(null);
 
-    const [ adaptTimesToReporting, setAdaptTimesToReporting ] = useState(false);
-
     const AuthCtxt = useContext(AuthContext);
 
 	useEffect(() => {
@@ -63,18 +61,24 @@ const MonthDetails = () => {
                         history.push(`/month/${val + '-01'}`);
                     }} />
             </div>
-            <div className="col-12">
-                {reportSummary !== null ? 
-                    <ul className="list-group list-group-flush">
-                        <li className="list-group-item bg-transparent">Work: {formatSeconds(reportSummary?.worktime)}</li>
-                        <li className="list-group-item bg-transparent">OB1: {formatSeconds(reportSummary?.ob1)}</li>
-                        <li className="list-group-item bg-transparent">OB2: {formatSeconds(reportSummary?.ob2)}</li>
-                        <li className="list-group-item bg-transparent">OB3: {formatSeconds(reportSummary?.ob3)}</li>
-                    </ul>
-                : null}
-            </div>
-            {loadingReport ? <Loadingspinner /> : <Calendar month={new Date(useMonth)} report={reportDetails} />}
-
+            {
+                loadingReport ? 
+                <Loadingspinner />
+                :
+                <>
+                    <div className="col-12">
+                        {reportSummary === null ? null : 
+                            <ul className="list-group list-group-flush">
+                                <li className="list-group-item bg-transparent">Work: {formatSeconds(reportSummary.worktime)}</li>
+                                <li className="list-group-item bg-transparent">OB1: {formatSeconds(reportSummary.ob1)}</li>
+                                <li className="list-group-item bg-transparent">OB2: {formatSeconds(reportSummary.ob2)}</li>
+                                <li className="list-group-item bg-transparent">OB3: {formatSeconds(reportSummary.ob3)}</li>
+                            </ul>
+                        }
+                    </div>
+                    <Calendar month={new Date(useMonth)} report={reportDetails} />
+                </>
+            }
         </div>
     );
 }

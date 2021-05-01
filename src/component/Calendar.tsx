@@ -44,7 +44,7 @@ const Calendar = ({ month, report }: CalendarProps) => {
                 
                 if (day >= to || day < 0) {
 
-                    days.push(<div key={day} className={`col calendar-box border-end ${borderColorClass}`}></div>);
+                    days.push(<div key={day} className={`col calendar-box disabled border-end ${borderColorClass}`}></div>);
 
                 } else {
                     let ourDay = monthStr + '-' + (String(day + 1).length === 1 ? '0' : '') + String(day + 1);
