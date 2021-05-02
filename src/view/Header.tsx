@@ -39,12 +39,12 @@ const Header = () => {
                                 <Link to="/month" className={`nav-link ${location[1] === 'month' ? 'active' : ''}`}>Month</Link>
                             </li>
                             <li>
-                                <a href="#" className="nav-link" onClick={() => { ThemeCtxt.toggle() }}>{ ThemeCtxt.mode === Theme.Light ? 'Dark' : 'Light'} mode</a>
+                                <a href="#a" className="nav-link" onClick={() => { ThemeCtxt.toggle() }}>{ ThemeCtxt.mode === Theme.Light ? 'Dark' : 'Light'} mode</a>
                             </li>
                             {
                                 AuthCtxt.authenticated ? 
                                     <li>
-                                        <a href="#" className="nav-link" onClick={async () => { await AuthCtxt.logout() }}>Logout</a>
+                                        <a href="#b" className="nav-link" onClick={async () => { await AuthCtxt.logout() }}>Logout</a>
                                     </li>
                                 :
                                     null

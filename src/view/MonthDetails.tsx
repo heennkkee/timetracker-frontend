@@ -5,7 +5,7 @@ import Api from "../helper/Api";
 import Loadingspinner from '../component/Loadingspinner';
 
 import Input from "../component/Input";
-import { useHistory, useParams, Link } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 import Calendar from "../component/Calendar";
 import { Worktime, WorktimeReport } from "../helper/types";
 import { formatSeconds } from "../helper/functions";
