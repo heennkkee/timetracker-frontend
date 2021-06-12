@@ -4,6 +4,9 @@
  */
 
 export interface paths {
+  "/ping": {
+    get: operations["generic.ping"];
+  };
   "/users": {
     get: operations["users.list_all"];
     post: operations["users.add"];
@@ -125,6 +128,11 @@ export interface components {
 }
 
 export interface operations {
+  "generic.ping": {
+    responses: {
+      200: components["responses"]["EmptyOk"];
+    };
+  };
   "users.list_all": {
     responses: {
       /** List all users */
