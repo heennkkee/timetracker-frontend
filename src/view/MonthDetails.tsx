@@ -27,7 +27,10 @@ const MonthDetails = () => {
 	useEffect(() => {
 		const fetchMonthReport = async () => {
             if (AuthCtxt.currentUser !== undefined) {
-                let fromDate = new Date(`${useMonth} 00:00:00`);
+
+                let split = useMonth.split('-');
+                split[split.length - 1] = '01';
+                let fromDate = new Date(`${split.join('-')} 00:00:00`);
 
                 let toDate = new Date(fromDate.getTime());
                 toDate.setMonth(toDate.getMonth() + 1);
