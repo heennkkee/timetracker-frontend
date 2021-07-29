@@ -51,6 +51,10 @@ const Calendar = ({ month, report }: CalendarProps) => {
                 } else {
                     let ourDay = monthStr + '-' + (String(day + 1).length === 1 ? '0' : '') + String(day + 1);
                     let rep = report[ourDay];
+
+                    if (new Date(ourDay).toLocaleDateString(undefined, { year: 'numeric', month: '2-digit', day: '2-digit' }) === new Date().toLocaleDateString(undefined, { year: 'numeric', month: '2-digit', day: '2-digit' })) {
+                        border += ' today-border';
+                    }
                     
 
                     let content: JSX.Element[] = [];

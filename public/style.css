@@ -105,3 +105,7 @@
 .border-white-50 {
     border-color: rgba(255, 255, 255, 0.5) !important;
 }
+
+.today-border {
+    border: 2px solid green !important;
+}
