@@ -7,7 +7,7 @@ import Loadingspinner from '../component/Loadingspinner';
 import Input from "../component/Input";
 import { useHistory, useParams } from "react-router-dom";
 import Calendar from "../component/Calendar";
-import { Worktime, WorktimeReport } from "../helper/types";
+import { WorktimeReport, WorktimeSummary } from "../helper/types";
 import { formatSeconds } from "../helper/functions";
 
 
@@ -20,7 +20,7 @@ const MonthDetails = () => {
     const [ loadingReport, setLoadingReport ] = useState<boolean>(true);
 
     const [ reportDetails, setReportDetails ] = useState<WorktimeReport>({});
-    const [ reportSummary, setReportSummary ] = useState<null | Worktime >(null);
+    const [ reportSummary, setReportSummary ] = useState<null | WorktimeSummary >(null);
 
     const AuthCtxt = useContext(AuthContext);
 
@@ -71,12 +71,13 @@ const MonthDetails = () => {
                 <>
                     <div className="col-12">
                         {reportSummary === null ? null : 
-                            <ul className="list-group list-group-flush">
-                                <li className="list-group-item bg-transparent">Work: {formatSeconds(reportSummary.worktime)}</li>
-                                <li className="list-group-item bg-transparent">OB1: {formatSeconds(reportSummary.ob1)}</li>
-                                <li className="list-group-item bg-transparent">OB2: {formatSeconds(reportSummary.ob2)}</li>
-                                <li className="list-group-item bg-transparent">OB3: {formatSeconds(reportSummary.ob3)}</li>
-                            </ul>
+                            <div className="row">
+                                <div className="col-12 col-lg-4">Work: {formatSeconds(reportSummary.worktime)}</div>
+                                <div className="col-12 col-lg-8">Scheduled: {formatSeconds(reportSummary.scheduled)}</div>
+                                <div className="col-4">OB1: {formatSeconds(reportSummary.ob1)}</div>
+                                <div className="col-4">OB2: {formatSeconds(reportSummary.ob2)}</div>
+                                <div className="col-4">OB3: {formatSeconds(reportSummary.ob3)}</div>
+                            </div>
                         }
                     </div>
                     <Calendar month={new Date(useMonth)} report={reportDetails} />

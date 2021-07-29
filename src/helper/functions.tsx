@@ -1,5 +1,5 @@
-export const formatSeconds = (seconds: number, removeTime: number = 0, adaptTimesToReporting: boolean = false) => {
-    if (seconds === 0) {
+export const formatSeconds = (seconds: number | undefined, removeTime: number = 0, adaptTimesToReporting: boolean = false) => {
+    if (seconds === undefined) {
         return '';
     }
 

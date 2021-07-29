@@ -69,7 +69,16 @@ export interface components {
       type?: string;
     };
     WorktimeSummary: {
+      scheduled: number;
       worktime: number;
+      ob1: number;
+      ob2: number;
+      ob3: number;
+    };
+    DaytimeSummary: {
+      scheduled: number;
+      worktime: number;
+      isHoliday: boolean;
       ob1: number;
       ob2: number;
       ob3: number;
@@ -308,7 +317,7 @@ export interface operations {
             data: {
               summary: components["schemas"]["WorktimeSummary"];
               details: {
-                [key: string]: components["schemas"]["WorktimeSummary"];
+                [key: string]: components["schemas"]["DaytimeSummary"];
               };
             };
           };
